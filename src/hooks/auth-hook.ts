@@ -30,6 +30,7 @@ export const useAuthHook = (fastify: FastifyInstance, rootURL: string) => {
         && authHeader.includes('Bearer')
         && (userID = authHeader.split(' ')[1])
         && userID.trim().length
+        && userID.length > 20
     );
 
     const isAuthorized = !!(
