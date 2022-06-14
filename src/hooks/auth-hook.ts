@@ -51,7 +51,7 @@ export const useAuthHook = (fastify: FastifyInstance, rootURL: string) => {
       done();
     }
     else {
-      res.code(403);
+      res.code(401);
       done(Error('Not Authorized'));
     }
 
