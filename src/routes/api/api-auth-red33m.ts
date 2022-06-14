@@ -42,28 +42,28 @@ const apiOptions: RouteShorthandOptions = {
 };
 
 
- const useAuthRed33mRoute = (fastify: FastifyInstance, rootURL: string) => {
-    fastify.put<AuthRed33mRequest>(`${rootURL}/auth/red33m`, apiOptions, (req, res) => {
-      const { isRed33med, passcode } = req.body;
-      res.log.info(`isRed33med: ${isRed33med}`);
-      res.log.info(`passcode: ${passcode}`);
+const useAuthRed33mRoute = (fastify: FastifyInstance, rootURL: string) => {
+  fastify.put<AuthRed33mRequest>(`${rootURL}/auth/red33m`, apiOptions, (req, res) => {
+    const { isRed33med, passcode } = req.body;
+    res.log.info(`isRed33med: ${isRed33med}`);
+    res.log.info(`passcode: ${passcode}`);
 
 
-      if (isRed33med) {
-        return res.forbidden();
-      }
+    if (isRed33med) {
+      return res.forbidden();
+    }
 
-      // if (!passcode || !passcode.trim().length) {
-      //   res.code(403);
-      //   return 'Forbidden';
-      // }
+    // if (!passcode || !passcode.trim().length) {
+    //   res.code(403);
+    //   return 'Forbidden';
+    // }
 
-      ////////////////////
-      // Verify passcode
-      ////////////////////
+    ////////////////////
+    // Verify passcode
+    ////////////////////
 
-      return 'not red33med';
-    });
+    return 'not red33med';
+  });
 };
 
 
