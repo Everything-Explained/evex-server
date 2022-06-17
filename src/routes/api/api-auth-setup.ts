@@ -1,41 +1,44 @@
 
-import { FastifyInstance } from "fastify";
+import { Type } from "@sinclair/typebox";
+import { FastifyInstance, RouteShorthandOptions } from "fastify";
+import { readFile } from "fs/promises";
+import { paths } from "../../config";
 import { addUser } from "../../database/users";
-import { APIRequest } from "../../hooks/authorize-api";
+import { APIRequest } from "../../hooks/api-auth-hook";
 
 
 
 
-
+const authSetupSchema: RouteShorthandOptions = {
+  schema: {
+    response: {
+      200: Type.String()
+    }
+  }
+};
 
 
 
 const useAuthSetupRoute = (fastify: FastifyInstance, rootURl: string) => {
-  fastify.get<APIRequest>(`${rootURl}/auth/setup`, (req, res) => {
+  fastify.get<APIRequest>(`${rootURl}/auth/setup`, authSetupSchema, async (req, res) => {
     const { hasValidID, userID, isAuthorized } = req.body;
 
     if (!hasValidID) {
-      res.code(403);
-      res.send('Forbidden');
-      return;
+      return res.badRequest('Invalid Auth Header');
     }
 
-
-    /////////////////////////////
-    // read from version file
-    ////////////////////////////
-
-
-    if (isAuthorized) {
-      return 'send authorized version data';
+    if (!isAuthorized) {
+      addUser(userID);
+      res.code(201);
     }
 
-    addUser(userID);
-
-    res.code(201);
-    return 'send created version data';
+    return (
+      await readFile(`${paths.web}/_data/versions.json`, { encoding: 'utf-8'})
+    );
   });
 };
+
+
 
 export default useAuthSetupRoute;
 
