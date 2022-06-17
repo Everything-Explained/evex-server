@@ -12,7 +12,7 @@
     "build:ts": "tsc",
     "watch:ts": "tsc -w",
     "dev": "npm run build:ts && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"npm:watch:ts\" \"npm:dev:start\"",
-    "dev:start": "fastify start --port 3001 --ignore-watch=.ts$ -w -l info -P dist/app.js"
+    "dev:start": "cross-env NODE_ENV=development fastify start --port 3001 --ignore-watch=.ts$ -w -l info -P dist/app.js"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +21,7 @@
     "@fastify/autoload": "^5.0.0",
     "@fastify/sensible": "^4.1.0",
     "@sinclair/typebox": "^0.23.5",
+    "argon2": "^0.28.5",
     "fastify": "^4.0.0",
     "fastify-cli": "^4.1.1",
     "fastify-plugin": "^3.0.0"
@@ -31,6 +32,7 @@
     "@typescript-eslint/eslint-plugin": "^5.3.0",
     "@typescript-eslint/parser": "^5.3.0",
     "concurrently": "^7.0.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.17.0",
     "fastify-tsconfig": "^1.0.1",
     "tap": "^16.1.0",
