@@ -1,28 +1,18 @@
 
 
- import { Static, Type } from "@sinclair/typebox";
+import { Type } from "@sinclair/typebox";
 import { FastifyInstance, RouteShorthandOptions } from "fastify";
-import { APIRequest } from "../../hooks/authorize-api";
+import { APIRequest } from "../../hooks/api-auth-hook";
+import * as argon from 'argon2';
+import { updateUser } from "../../database/users";
+import { serverConfig } from "../../config";
 
 
 
 
-/**
- * Route  : /api/auth/red33m
- * Method : PUT
- * Body   : { passcode: string; }
- */
-
-// interface AuthRed33mRequest extends APIRequest {
-//   //
-// }
-
-const red33mBody = Type.Object({
-  passcode: Type.String()
-});
 
 type AuthRed33mRequest = APIRequest & {
-  Body: Static<typeof red33mBody>
+  Body: { passcode: string };
 }
 
 const apiOptions: RouteShorthandOptions = {
@@ -31,11 +21,6 @@ const apiOptions: RouteShorthandOptions = {
       passcode: Type.String()
     }))),
     response: {
-      400: Type.String(),
-      403: Type.Strict(Type.Object({
-        statusCode: Type.String(),
-        message: Type.String(),
-      })),
       200: Type.String(),
     },
   }
@@ -43,26 +28,23 @@ const apiOptions: RouteShorthandOptions = {
 
 
 const useAuthRed33mRoute = (fastify: FastifyInstance, rootURL: string) => {
-  fastify.put<AuthRed33mRequest>(`${rootURL}/auth/red33m`, apiOptions, (req, res) => {
-    const { isRed33med, passcode } = req.body;
-    res.log.info(`isRed33med: ${isRed33med}`);
-    res.log.info(`passcode: ${passcode}`);
-
+  fastify.put<AuthRed33mRequest>(`${rootURL}/auth/red33m`, apiOptions, async (req, res) => {
+    const { isRed33med, passcode, userID } = req.body;
 
     if (isRed33med) {
-      return res.forbidden();
+      return res.conflict('Already Logged In');
     }
 
-    // if (!passcode || !passcode.trim().length) {
-    //   res.code(403);
-    //   return 'Forbidden';
-    // }
+    if (!passcode.trim()) {
+      return res.badRequest('Missing Passcode');
+    }
 
-    ////////////////////
-    // Verify passcode
-    ////////////////////
+    if (!await argon.verify(serverConfig.auth.red33m, passcode)) {
+      return res.unauthorized('Invalid Passcode');
+    }
 
-    return 'not red33med';
+    updateUser(userID, 'code');
+    return 'OK';
   });
 };
 
