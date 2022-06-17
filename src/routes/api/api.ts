@@ -2,7 +2,7 @@
 import { FastifyPluginAsync, RouteShorthandOptions } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import useAuthSetupRoute from './api-auth-setup';
-import { useAuthHook } from '../../hooks/authorize-api';
+import { useAPIAuthHook } from '../../hooks/api-auth-hook';
 import useAuthRed33mRoute from './api-auth-red33m';
 
 
@@ -19,7 +19,7 @@ const apiOptions: RouteShorthandOptions = {
 
 
 const api: FastifyPluginAsync = async (fastify) => {
-  useAuthHook(fastify, '/api');
+  useAPIAuthHook(fastify);
   useAuthSetupRoute(fastify, '/api');
   useAuthRed33mRoute(fastify, '/api');
 

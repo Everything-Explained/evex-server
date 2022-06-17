@@ -18,10 +18,10 @@ export type APIRequest = {
 
 
 
-export const useAuthHook = (fastify: FastifyInstance, rootURL: string) => {
+export const useAPIAuthHook = (fastify: FastifyInstance) => {
   fastify.addHook('preValidation', (req, res, done) => {
     const authHeader = req.headers['authorization'];
-    const isAuthSetup = req.url == `${rootURL}/auth/setup`;
+    const isAuthSetup = req.url == `/api/auth/setup`;
     let userID = '';
     let userState: string|undefined = '';
 
