@@ -13,7 +13,7 @@ const api: FastifyPluginAsync = async (fastify) => {
   useAuthSetupRoute(fastify, '/api');
   useAuthRed33mRoute(fastify, '/api');
 
-  fastify.get('/api*', (req, res) => {
+  fastify.all('/api*', (req, res) => {
     return res.forbidden('Suspicious Activity Detected');
   });
 };
