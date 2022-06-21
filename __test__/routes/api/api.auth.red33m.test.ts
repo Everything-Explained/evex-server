@@ -2,7 +2,7 @@
 
 import { readFile, writeFile } from 'fs/promises';
 import { test } from 'tap';
-import { build, is201, is400, is409 } from '../../test.fastify';
+import { build, is400, is409 } from '../../test.fastify';
 import * as config from '../../../config.json';
 
 
@@ -30,11 +30,11 @@ test('/api/auth/red33m', async (t) => {
     url,
     method: 'PUT',
     headers: authorizedHeader,
-    payload: { passcode: config.auth.testPasscode }
+    payload: { passcode: config.auth.testCode }
   });
-
   const is201 = res5.statusCode == 201;
   t.equal(is201 && res5.payload == 'OK', true, 'responds with 201, when passcode is valid');
+
   const users = JSON.parse(await readFile('./users.json', { encoding: 'utf-8'}));
   t.equal(users[userID], 'code', 'updates user ID entry with "code", when passcode is valid');
 
@@ -42,7 +42,7 @@ test('/api/auth/red33m', async (t) => {
     url,
     method: 'PUT',
     headers: authorizedHeader,
-    payload: { passcode: config.auth.testPasscode }
+    payload: { passcode: config.auth.testCode }
   });
   t.equal(is409(res6.payload), true, 'recognizes new red33m users without restart');
 
