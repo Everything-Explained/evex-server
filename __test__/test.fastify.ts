@@ -2,9 +2,7 @@
 import Fastify from 'fastify';
 import fp from 'fastify-plugin';
 import App from '../src/app';
-import * as tap from 'tap';
 
-export type Test = typeof tap['Test']['prototype'];
 export const is201 = (payload: string) => payload.includes('"statusCode":201');
 export const is400 = (payload: string) => payload.includes('"statusCode":400');
 export const is401 = (payload: string) => payload.includes('"statusCode":401');
@@ -17,7 +15,7 @@ async function config () {
 }
 
 // Automatically build and tear down our in
-async function build (t: Test) {
+async function build () {
   const app = Fastify();
 
   // fastify-plugin ensures that all decorators
@@ -26,9 +24,6 @@ async function build (t: Test) {
   void app.register(fp(App), await config());
 
   await app.ready();
-
-  // Tear down our app after we are done
-  t.teardown(() => void app.close());
 
   return app;
 }

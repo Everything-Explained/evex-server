@@ -1,61 +1,131 @@
 
 
 import { readFile, writeFile } from 'fs/promises';
-import { test } from 'tap';
 import { build, is400, is409 } from '../../test.fastify';
+import { describe } from 'riteway';
 import * as config from '../../../config.json';
+import { FastifyInstance } from 'fastify';
 
 
 
-test('/api/auth/red33m', async (t) => {
-  const app = await build(t);
-  const url = '/api/auth/red33m';
-  const userID = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz';
-  const r3dUserID = 'zyxwvutsrqponmlkjihgfedcbazyxwvutsrqponmlkjihgfedcba';
-  const authorizedHeader = { 'authorization': `Bearer ${userID}`};
-  const r3dAuthHeader = { 'authorization': `Bearer ${r3dUserID}`};
+const url = '/api/auth/red33m';
+const userID = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz';
+const r3dUserID = 'zyxwvutsrqponmlkjihgfedcbazyxwvutsrqponmlkjihgfedcba';
+const authorizedHeader = { 'authorization': `Bearer ${userID}`};
+const r3dAuthHeader = { 'authorization': `Bearer ${r3dUserID}`};
 
-  const res2 = await app.inject({ url, method: 'PUT', headers: authorizedHeader });
-  const requiresPasscode = res2.payload.includes(`required property 'passcode'`);
-  t.equal(is400(res2.payload) && requiresPasscode, true, 'rejects with 400, when missing passcode');
 
-  const res3 = await app.inject({ url, method: 'PUT', headers: authorizedHeader, payload: { passcode: 'asdf' }});
-  const hasInvalidPasscode = res3.payload.includes('Invalid Passcode');
-  t.equal(is400(res3.payload) && hasInvalidPasscode, true, 'rejects with 400, when passcode invalid');
+describe('PUT /api/auth/red33m', async t => {
+  const app = await build();
 
-  const res4 = await app.inject({ url, method: 'PUT', headers: authorizedHeader, payload: { passcode: '   ' }});
-  const isEmptyCode = res4.payload.includes('Missing Passcode');
-  t.equal(is400(res4.payload) && isEmptyCode, true, 'rejects with 400, when passcode is empty');
-
-  const res5 = await app.inject({ url, method: 'PUT', headers: r3dAuthHeader, payload: { passcode: 'asdf' }});
-  t.equal(is409(res5.payload), true, 'rejects with 409, when user already logged in');
-
-  const res6 = await app.inject({
-    url,
-    method: 'PUT',
-    headers: authorizedHeader,
-    payload: { passcode: config.auth.testCode }
+  t({
+    given: 'no passcode',
+    should: 'send 400 status & message',
+    actual: await testRequiredPasscode(app),
+    expected: true
   });
-  const is201 = res6.statusCode == 201;
-  t.equal(is201 && res6.payload == 'OK', true, 'responds with 201, when passcode is valid');
 
+  t({
+    given: 'an invalid passcode',
+    should: 'send 400 status & message',
+    actual: await testInvalidPasscode(app),
+    expected: true,
+  });
+
+  t({
+    given: 'an empty passcode',
+    should: 'send 400 status & message',
+    actual: await testEmptyPasscode(app),
+    expected: true,
+  });
+
+  t({
+    given: 'already existing credentials',
+    should: 'send 409 status & message',
+    actual: await testAlreadyLoggedIn(app),
+    expected: true,
+  });
+
+  t({
+    given: 'valid passcode',
+    should: 'send 201 & "OK"',
+    actual: await testLoginSuccess(app),
+    expected: true,
+  });
+
+  t({
+    given: 'valid passcode',
+    should: 'update user with "code"',
+    actual: await testUserAddedOnLogin(),
+    expected: 'code',
+  });
+
+  t({
+    given: 'a new logged in user',
+    should: 'recognize user',
+    actual: await testNewLoggedInUser(app),
+    expected: true,
+  });
+
+  // cleanup
   const users = JSON.parse(await readFile('./users.json', { encoding: 'utf-8'}));
-  t.equal(users[userID], 'code', 'updates user ID entry with "code", when passcode is valid');
-
-  const res7 = await app.inject({
-    url,
-    method: 'PUT',
-    headers: authorizedHeader,
-    payload: { passcode: config.auth.testCode }
-  });
-  t.equal(is409(res7.payload), true, 'recognizes new red33m users without restart');
-
-  // Cleanup
   users[userID] = 'nocode';
   await writeFile('./users.json', JSON.stringify(users, null, 2));
+  app.close();
 
 });
 
+
+async function testRequiredPasscode(app: FastifyInstance) {
+  const { payload } = await app.inject({ url, method: 'PUT', headers: authorizedHeader });
+  return is400(payload) && payload.includes(`required property 'passcode'`);
+}
+
+
+async function testInvalidPasscode(app: FastifyInstance) {
+  const { payload } = await app.inject({ url, method: 'PUT', headers: authorizedHeader, payload: { passcode: 'asdf' }});
+  return payload.includes('Invalid Passcode') && is400(payload);
+}
+
+
+async function testEmptyPasscode(app: FastifyInstance) {
+  const  { payload } = await app.inject({ url, method: 'PUT', headers: authorizedHeader, payload: { passcode: '   ' }});
+  return is400(payload) && payload.includes('Missing Passcode');
+}
+
+
+async function testAlreadyLoggedIn(app: FastifyInstance) {
+  const { payload } = await app.inject({ url, method: 'PUT', headers: r3dAuthHeader, payload: { passcode: 'asdf' }});
+  return is409(payload) && payload.includes('Already Logged In');
+}
+
+
+async function testLoginSuccess(app: FastifyInstance) {
+  const { payload, statusCode } = await app.inject({
+    url,
+    method: 'PUT',
+    headers: authorizedHeader,
+    payload: { passcode: config.auth.testCode }
+  });
+  return statusCode == 201 && payload == 'OK';
+}
+
+
+async function testUserAddedOnLogin() {
+  const users = JSON.parse(await readFile('./users.json', { encoding: 'utf-8'}));
+  return users[userID];
+}
+
+
+async function testNewLoggedInUser(app: FastifyInstance) {
+  const { payload } = await app.inject({
+    url,
+    method: 'PUT',
+    headers: authorizedHeader,
+    payload: { passcode: config.auth.testCode }
+  });
+  return is409(payload);
+}
 
 
 
