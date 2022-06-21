@@ -21,7 +21,7 @@ const apiOptions: RouteShorthandOptions = {
       passcode: Type.String()
     }))),
     response: {
-      200: Type.String(),
+      201: Type.String(),
     },
   }
 };
@@ -40,10 +40,11 @@ const useAuthRed33mRoute = (fastify: FastifyInstance, rootURL: string) => {
     }
 
     if (!await argon.verify(serverConfig.auth.red33m, passcode)) {
-      return res.unauthorized('Invalid Passcode');
+      return res.badRequest('Invalid Passcode');
     }
 
     updateUser(userID, 'code');
+    res.code(201);
     return 'OK';
   });
 };
