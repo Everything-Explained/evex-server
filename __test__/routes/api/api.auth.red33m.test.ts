@@ -23,20 +23,12 @@ test('/api/auth/red33m', async (t) => {
   const hasInvalidPasscode = res3.payload.includes('Invalid Passcode');
   t.equal(is400(res3.payload) && hasInvalidPasscode, true, 'rejects with 400, when passcode invalid');
 
-  const res4 = await app.inject({ url, method: 'PUT', headers: r3dAuthHeader, payload: { passcode: 'asdf' }});
-  t.equal(is409(res4.payload), true, 'rejects with 409, when user already logged in');
+  const res4 = await app.inject({ url, method: 'PUT', headers: authorizedHeader, payload: { passcode: '   ' }});
+  const isEmptyCode = res4.payload.includes('Missing Passcode');
+  t.equal(is400(res4.payload) && isEmptyCode, true, 'rejects with 400, when passcode is empty');
 
-  const res5 = await app.inject({
-    url,
-    method: 'PUT',
-    headers: authorizedHeader,
-    payload: { passcode: config.auth.testCode }
-  });
-  const is201 = res5.statusCode == 201;
-  t.equal(is201 && res5.payload == 'OK', true, 'responds with 201, when passcode is valid');
-
-  const users = JSON.parse(await readFile('./users.json', { encoding: 'utf-8'}));
-  t.equal(users[userID], 'code', 'updates user ID entry with "code", when passcode is valid');
+  const res5 = await app.inject({ url, method: 'PUT', headers: r3dAuthHeader, payload: { passcode: 'asdf' }});
+  t.equal(is409(res5.payload), true, 'rejects with 409, when user already logged in');
 
   const res6 = await app.inject({
     url,
@@ -44,7 +36,19 @@ test('/api/auth/red33m', async (t) => {
     headers: authorizedHeader,
     payload: { passcode: config.auth.testCode }
   });
-  t.equal(is409(res6.payload), true, 'recognizes new red33m users without restart');
+  const is201 = res6.statusCode == 201;
+  t.equal(is201 && res6.payload == 'OK', true, 'responds with 201, when passcode is valid');
+
+  const users = JSON.parse(await readFile('./users.json', { encoding: 'utf-8'}));
+  t.equal(users[userID], 'code', 'updates user ID entry with "code", when passcode is valid');
+
+  const res7 = await app.inject({
+    url,
+    method: 'PUT',
+    headers: authorizedHeader,
+    payload: { passcode: config.auth.testCode }
+  });
+  t.equal(is409(res7.payload), true, 'recognizes new red33m users without restart');
 
   // Cleanup
   users[userID] = 'nocode';
