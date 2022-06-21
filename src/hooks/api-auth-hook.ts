@@ -29,7 +29,6 @@ export const useAPIAuthHook = (fastify: FastifyInstance) => {
            authHeader
         && authHeader.includes('Bearer')
         && (userID = authHeader.split(' ')[1])
-        && userID.trim().length
         && userID.length > 20
     );
 
