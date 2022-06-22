@@ -4,8 +4,8 @@
   "description": "This project was bootstrapped with Fastify-CLI.",
   "main": "app.ts",
   "scripts": {
-    "test": "riteway -r ts-node/register/transpile-only __test__/**/*.test.ts | tap-nirvana",
-    "cov": "nyc --reporter=html --reporter=text-summary npm run test",
+    "test": "cross-env NODE_ENV=development riteway -r ts-node/register/transpile-only __test__/**/*.test.ts | tap-nirvana",
+    "cov": "cross-env NODE_ENV=development nyc --reporter=html --reporter=text-summary npm run test",
     "start": "npm run build:ts && fastify start -l info dist/app.js",
     "build:ts": "tsc",
     "watch:ts": "tsc -w",
