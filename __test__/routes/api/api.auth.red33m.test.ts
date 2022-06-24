@@ -68,11 +68,7 @@ describe('PUT /api/auth/red33m', async t => {
   });
 
   // cleanup
-  const users = JSON.parse(await readFile('./users.json', { encoding: 'utf-8'}));
-  users[userID] = 'nocode';
-  await writeFile('./users.json', JSON.stringify(users, null, 2));
-  app.close();
-
+  await app.close();
 });
 
 
@@ -124,6 +120,11 @@ async function testNewLoggedInUser(app: FastifyInstance) {
     headers: authorizedHeader,
     payload: { passcode: config.auth.testCode }
   });
+
+  // Cleanup
+  const users = JSON.parse(await readFile('./users.json', { encoding: 'utf-8'}));
+  users[userID] = 'nocode';
+  await writeFile('./users.json', JSON.stringify(users, null, 2));
   return is409(payload);
 }
 
