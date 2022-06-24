@@ -52,7 +52,7 @@ async function getPageData(params: object, res: FastifyReply) {
     return await tryReadFile(pathJoin(dataDir, path), res);
   }
 
-  return res.badRequest('Unsupported Request');
+  return res.unsupportedMediaType('Unsupported Request');
 }
 
 

@@ -64,7 +64,7 @@ describe('GET /api/data', async t => {
 
   t({
     given: '/data/file.nonSupportedExt',
-    should: 'send 400 status & message',
+    should: 'send 415 status & message',
     actual: await testUnsupportedExt(app),
     expected: true
   });
@@ -120,7 +120,7 @@ async function testMDHTML(app: FastifyInstance) {
 
 async function testUnsupportedExt(app: FastifyInstance) {
   const { payload, statusCode } = await app.inject({ url: `${url}/blog/test.html`, headers: authorizedHeader });
-  return statusCode == 400 && payload.includes('Unsupported');
+  return statusCode == 415 && payload.includes('Unsupported');
 }
 
 async function testFileNotFound(app: FastifyInstance) {
