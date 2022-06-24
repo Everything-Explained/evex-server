@@ -1,7 +1,7 @@
 
 
 import { readFile, writeFile } from 'fs/promises';
-import { build, is400, is409 } from '../../test.fastify';
+import { authorizedHeader, build, is400, is409, r3dAuthHeader, userID } from '../../test.fastify';
 import { describe } from 'riteway';
 import * as config from '../../../config.json';
 import { FastifyInstance } from 'fastify';
@@ -9,10 +9,7 @@ import { FastifyInstance } from 'fastify';
 
 
 const url = '/api/auth/red33m';
-const userID = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz';
-const r3dUserID = 'zyxwvutsrqponmlkjihgfedcbazyxwvutsrqponmlkjihgfedcba';
-const authorizedHeader = { 'authorization': `Bearer ${userID}`};
-const r3dAuthHeader = { 'authorization': `Bearer ${r3dUserID}`};
+
 
 
 describe('PUT /api/auth/red33m', async t => {

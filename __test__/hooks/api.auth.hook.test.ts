@@ -1,11 +1,10 @@
 import { FastifyInstance } from "fastify";
 import { describe } from "riteway";
-import { build } from "../test.fastify";
+import { build, userID } from "../test.fastify";
 
 
 
 const url = '/api';
-const userID = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz';
 
 
 

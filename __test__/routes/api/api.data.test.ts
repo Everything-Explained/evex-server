@@ -1,15 +1,13 @@
 
 
 import { describe } from 'riteway';
-import { build } from '../../test.fastify';
+import { authorizedHeader, build } from '../../test.fastify';
 import { FastifyInstance } from 'fastify';
 
 
 
 
 const url = '/api/data';
-const userID = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz';
-const authorizedHeader = { 'authorization': `Bearer ${userID}`};
 
 
 describe('GET /api/data', async t => {

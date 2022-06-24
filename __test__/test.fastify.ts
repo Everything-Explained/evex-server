@@ -8,6 +8,11 @@ export const is400 = (payload: string) => payload.includes('"statusCode":400');
 export const is401 = (payload: string) => payload.includes('"statusCode":401');
 export const is409 = (payload: string) => payload.includes('"statusCode":409');
 
+export const userID = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz';
+export const r3dUserID = 'zyxwvutsrqponmlkjihgfedcbazyxwvutsrqponmlkjihgfedcba';
+export const authorizedHeader = { 'authorization': `Bearer ${userID}`};
+export const r3dAuthHeader = { 'authorization': `Bearer ${r3dUserID}`};
+
 // Fill in this config with all the configurations
 // needed for testing the application
 async function config () {
