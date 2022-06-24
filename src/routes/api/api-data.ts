@@ -57,22 +57,22 @@ async function getPageData(params: object, res: FastifyReply) {
 
 
 function getFilePathFromParams(params: object) {
-  const dirs      = Object.values(params);
-  const dirLength = dirs.length - 1;
-  const lastDir   = dirs[dirLength];
+  const segments  = Object.values(params);
+  const lastSeg   = segments.pop();
+  const segLength = segments.length - 1;
 
-  let path =
-    !lastDir.includes('.')
-      ? `${lastDir}/${lastDir}.json`
-      : lastDir
+  let uri =
+    lastSeg.includes('.')
+      ? lastSeg
+      : `${lastSeg}/${lastSeg}.json`
   ;
 
-  for (let i = dirLength - 1; i > -1; i--) {
-    const dir = dirs[i];
-    path = `${dir}/${path}`;
+  for (let i = segLength; i > -1; i--) {
+    const seg = segments[i];
+    uri = `${seg}/${uri}`;
   }
 
-  return path;
+  return uri;
 }
 
 
