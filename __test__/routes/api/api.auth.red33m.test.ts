@@ -3,7 +3,6 @@
 import { readFile, writeFile } from 'fs/promises';
 import { authorizedHeader, build, is400, is409, r3dAuthHeader, userID } from '../../test.fastify';
 import { describe } from 'riteway';
-import * as config from '../../../config.json';
 import { FastifyInstance } from 'fastify';
 
 
@@ -98,7 +97,7 @@ async function testLoginSuccess(app: FastifyInstance) {
     url,
     method: 'PUT',
     headers: authorizedHeader,
-    payload: { passcode: config.auth.testCode }
+    payload: { passcode: 'hello world' }
   });
   return statusCode == 201 && payload == 'OK';
 }
@@ -115,7 +114,7 @@ async function testNewLoggedInUser(app: FastifyInstance) {
     url,
     method: 'PUT',
     headers: authorizedHeader,
-    payload: { passcode: config.auth.testCode }
+    payload: { passcode: 'hello world' }
   });
 
   // Cleanup
