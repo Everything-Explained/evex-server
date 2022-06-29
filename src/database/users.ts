@@ -18,7 +18,7 @@ export const USERS: UserObj =
 
 export function addUser(userid: string) {
   USERS[userid] = 'nocode';
-  saveUsers();
+  return saveUsers();
 }
 
 

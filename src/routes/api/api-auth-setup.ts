@@ -12,7 +12,8 @@ import { APIRequest } from "../../hooks/api-auth-hook";
 const authSetupSchema: RouteShorthandOptions = {
   schema: {
     response: {
-      200: Type.String()
+      200: Type.String(),
+      201: Type.String(),
     }
   }
 };
@@ -28,7 +29,7 @@ const useAuthSetupRoute = (fastify: FastifyInstance, rootURl: string) => {
     }
 
     if (!isAuthorized) {
-      addUser(userID);
+      await addUser(userID);
       res.code(201);
     }
 
