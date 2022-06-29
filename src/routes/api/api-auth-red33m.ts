@@ -43,7 +43,7 @@ const useAuthRed33mRoute = (fastify: FastifyInstance, rootURL: string) => {
       return res.badRequest('Invalid Passcode');
     }
 
-    updateUser(userID, 'code');
+    await updateUser(userID, 'code');
     res.code(201);
     return 'OK';
   });

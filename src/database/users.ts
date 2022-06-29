@@ -24,7 +24,7 @@ export function addUser(userid: string) {
 
 export function updateUser(user: string, val: 'code'|'nocode') {
   USERS[user] = val;
-  saveUsers();
+  return saveUsers();
 }
 
 
@@ -35,8 +35,11 @@ let fileQueue = -1
 ;
 export function saveUsers() {
   ++fileQueue;
-  setTimeout(async () => {
-    await writeFile('./users.json', JSON.stringify(USERS, null, 2));
-    --fileQueue;
-  }, fileQueue * 250);
+  return new Promise(rs => {
+    setTimeout(async () => {
+      await writeFile('./users.json', JSON.stringify(USERS, null, 2));
+      rs(true);
+      --fileQueue;
+    }, fileQueue * 250);
+  });
 }
