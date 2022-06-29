@@ -11,6 +11,7 @@ export const is409 = (payload: string) => payload.includes('"statusCode":409');
 export const userID = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz';
 export const r3dUserID = 'zyxwvutsrqponmlkjihgfedcbazyxwvutsrqponmlkjihgfedcba';
 export const authorizedHeader = { 'authorization': `Bearer ${userID}`};
+export const constAuthedHeader = { 'authorization': `Bearer abqdefbhijklmngpqrstuvhxyoabcdeughijklmnnmqrstuvvxyz`};
 export const r3dAuthHeader = { 'authorization': `Bearer ${r3dUserID}`};
 
 // Fill in this config with all the configurations

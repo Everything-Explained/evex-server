@@ -8,6 +8,7 @@ export interface ServerConfig {
 
 interface ConfigAuth {
   red33m: string;
+  testCode: string;
 }
 
 interface Mail {

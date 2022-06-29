@@ -5,5 +5,5 @@
     "sourceMap": true,
     "noEmitOnError": false
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "__test__/helpers/mock-mail.ts"]
 }

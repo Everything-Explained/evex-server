@@ -11,6 +11,7 @@ export const serverConfig = (() => {
   const config: ServerConfig = JSON.parse(
     readFileSync(`${pathResolve('./config.json')}`, { encoding: 'utf-8'})
   );
+  config.mail.toEthan = inDev && 'fake@test.yee' || config.mail.toEthan;
   config.auth.red33m  = inDev && config.auth.testCode || config.auth.red33m;
   return config;
 })();
