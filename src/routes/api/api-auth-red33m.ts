@@ -39,7 +39,7 @@ const useAuthRed33mRoute = (fastify: FastifyInstance, rootURL: string) => {
       return res.badRequest('Missing Passcode');
     }
 
-    if (!await argon.verify(serverConfig.auth.red33m, passcode)) {
+    if (!await argon.verify(serverConfig().auth.red33m, passcode)) {
       return res.badRequest('Invalid Passcode');
     }
 

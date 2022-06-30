@@ -18,7 +18,7 @@ interface DataRequest {
 
 
 
-const dataDir = pathJoin(paths.web, '_data');
+const dataDir = pathJoin(paths().web, '_data');
 
 
 

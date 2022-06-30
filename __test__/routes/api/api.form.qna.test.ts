@@ -426,7 +426,7 @@ describe('POST /api/form/qna -- createMail()', async t => {
     given: 'request body',
     should: 'mail to ethan',
     actual: mail.to,
-    expected: serverConfig.mail.toEthan,
+    expected: serverConfig().mail.toEthan,
   });
 
   t({

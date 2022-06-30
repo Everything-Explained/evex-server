@@ -47,7 +47,7 @@ const formSubjects: Array<FormSubject> = [
 
 const state = {
   transport: mailer.createTransport(
-    inDev && serverConfig.mail.mailtrap || serverConfig.mail.sendinblue
+    inDev && serverConfig().mail.mailtrap || serverConfig().mail.sendinblue
   )
 } as {
   transport: mailer.Transporter|typeof mockTransport
@@ -138,7 +138,7 @@ function createEmail(body: QnAFormReqBody) {
 
   const mail: Mail.Options = {
     from    : `"${name}" <${email}>`,
-    to      : serverConfig.mail.toEthan,
+    to      : serverConfig().mail.toEthan,
     subject : formSubjects[type],
     text    : buildTextMsg(questions),
     html    : buildHTMLMsg(questions),

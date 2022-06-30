@@ -34,7 +34,7 @@ const useAuthSetupRoute = (fastify: FastifyInstance, rootURl: string) => {
     }
 
     return (
-      await readFile(`${paths.web}/_data/versions.json`, { encoding: 'utf-8'})
+      await readFile(`${paths().web}/_data/versions.json`, { encoding: 'utf-8'})
     );
   });
 };
