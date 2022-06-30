@@ -66,7 +66,7 @@ async function testMissingAuthHeader(app: FastifyInstance) {
 
 async function testMissingAuthBearer(app: FastifyInstance) {
  const { statusCode } = await app.inject({ url: '/api', headers: { 'authorization': 'asdf' }});
- return statusCode
+ return statusCode;
 }
 
 

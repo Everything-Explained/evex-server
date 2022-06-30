@@ -1,8 +1,7 @@
 
 
 import { describe } from 'riteway';
-import { authorizedHeader, build, constAuthedHeader, r3dAuthHeader } from '../../test.fastify';
-import { FastifyInstance } from 'fastify';
+import { build, constAuthedHeader, r3dAuthHeader } from '../../test.fastify';
 import { QnAFormReqBody, _tdd_testAPIFormQna } from '../../../src/routes/api/api-form-qna';
 import { serverConfig } from '../../../src/config';
 
