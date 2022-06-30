@@ -44,10 +44,11 @@ const formSubjects: Array<FormSubject> = [
   `EvEx Form - I want to correct you`,
 ];
 
+const config = serverConfig();
 
 const state = {
   transport: mailer.createTransport(
-    inDev && serverConfig().mail.mailtrap || serverConfig().mail.sendinblue
+    inDev && config.mail.mailtrap || config.mail.sendinblue
   )
 } as {
   transport: mailer.Transporter|typeof mockTransport
@@ -138,7 +139,7 @@ function createEmail(body: QnAFormReqBody) {
 
   const mail: Mail.Options = {
     from    : `"${name}" <${email}>`,
-    to      : serverConfig().mail.toEthan,
+    to      : config.mail.toEthan,
     subject : formSubjects[type],
     text    : buildTextMsg(questions),
     html    : buildHTMLMsg(questions),

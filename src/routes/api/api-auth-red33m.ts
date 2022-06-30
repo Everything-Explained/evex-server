@@ -15,6 +15,7 @@ type AuthRed33mRequest = APIRequest & {
   Body: { passcode: string };
 }
 
+const red33mHash = serverConfig().auth.red33m;
 const apiOptions: RouteShorthandOptions = {
   schema: {
     body: Type.Strict(Type.Required(Type.Object({
@@ -39,7 +40,7 @@ const useAuthRed33mRoute = (fastify: FastifyInstance, rootURL: string) => {
       return res.badRequest('Missing Passcode');
     }
 
-    if (!await argon.verify(serverConfig().auth.red33m, passcode)) {
+    if (!await argon.verify(red33mHash, passcode)) {
       return res.badRequest('Invalid Passcode');
     }
 

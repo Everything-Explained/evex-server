@@ -8,7 +8,7 @@ import { APIRequest } from "../../hooks/api-auth-hook";
 
 
 
-
+const webPath = paths().web;
 const authSetupSchema: RouteShorthandOptions = {
   schema: {
     response: {
@@ -34,7 +34,7 @@ const useAuthSetupRoute = (fastify: FastifyInstance, rootURl: string) => {
     }
 
     return (
-      await readFile(`${paths().web}/_data/versions.json`, { encoding: 'utf-8'})
+      await readFile(`${webPath}/_data/versions.json`, { encoding: 'utf-8'})
     );
   });
 };
