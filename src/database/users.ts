@@ -9,11 +9,7 @@ if (!existsSync('./users.json')) {
   writeFileSync('./users.json', JSON.stringify({}));
 }
 
-export const USERS: UserObj =
-  existsSync('./users.json')
-    ? JSON.parse(readFileSync('./users.json', 'utf-8'))
-    : {}
-;
+export const USERS: UserObj = JSON.parse(readFileSync('./users.json', 'utf-8'));
 
 
 export function addUser(userid: string) {
