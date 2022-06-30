@@ -3,11 +3,6 @@ import Fastify from 'fastify';
 import fp from 'fastify-plugin';
 import App from '../src/app';
 
-export const is201 = (payload: string) => payload.includes('"statusCode":201');
-export const is400 = (payload: string) => payload.includes('"statusCode":400');
-export const is401 = (payload: string) => payload.includes('"statusCode":401');
-export const is409 = (payload: string) => payload.includes('"statusCode":409');
-
 export const userID = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz';
 export const r3dUserID = 'zyxwvutsrqponmlkjihgfedcbazyxwvutsrqponmlkjihgfedcba';
 export const authorizedHeader = { 'authorization': `Bearer ${userID}`};

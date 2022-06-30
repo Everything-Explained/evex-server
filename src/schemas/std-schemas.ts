@@ -1,9 +1,9 @@
-import { Type } from "@sinclair/typebox";
+import { Static, Type } from "@sinclair/typebox";
 
 
 
 
-
+export type BadRequestSchema = Static<typeof badRequestSchema['400']>;
 
 export const badRequestSchema = {
   400: Type.Strict(Type.Object({

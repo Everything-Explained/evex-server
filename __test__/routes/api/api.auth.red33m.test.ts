@@ -1,9 +1,10 @@
 
 
 import { readFile, writeFile } from 'fs/promises';
-import { authorizedHeader, build, is400, is409, r3dAuthHeader, userID } from '../../test.fastify';
+import { authorizedHeader, build, constAuthedHeader, r3dAuthHeader, userID } from '../../test.fastify';
 import { describe } from 'riteway';
-import { FastifyInstance } from 'fastify';
+import { BadRequestSchema } from '../../../src/schemas/std-schemas';
+import { getUserState } from '../../../src/database/users';
 
 
 
@@ -14,53 +15,88 @@ const url = '/api/auth/red33m';
 describe('PUT /api/auth/red33m', async t => {
   const app = await build();
 
+
+  const testRequiredPasscode =  await testPasscode();
   t({
     given: 'no passcode',
-    should: 'send 400 status & message',
-    actual: await testRequiredPasscode(app),
-    expected: true
+    should: 'send 400 status',
+    actual: testRequiredPasscode.statusCode,
+    expected: 400
+  });
+
+  t({
+    given: 'no passcode',
+    should: 'send custom message',
+    actual: testRequiredPasscode.message,
+    expected: `body must have required property 'passcode'`
+  });
+
+  const testInvalidPasscode = await testPasscode({ passcode: 'asdf'});
+  t({
+    given: 'an invalid passcode',
+    should: 'send 400 status',
+    actual: testInvalidPasscode.statusCode ,
+    expected: 400,
   });
 
   t({
     given: 'an invalid passcode',
-    should: 'send 400 status & message',
-    actual: await testInvalidPasscode(app),
-    expected: true,
+    should: 'send custom message',
+    actual: testInvalidPasscode.message,
+    expected: 'Invalid Passcode',
+  });
+
+  const testEmptyPasscode = await testPasscode({ passcode: '        '});
+  t({
+    given: 'an empty passcode',
+    should: 'send 400 status',
+    actual: testEmptyPasscode.statusCode,
+    expected: 400,
   });
 
   t({
     given: 'an empty passcode',
-    should: 'send 400 status & message',
-    actual: await testEmptyPasscode(app),
-    expected: true,
+    should: 'send custom message',
+    actual: testEmptyPasscode.message,
+    expected: 'Missing Passcode',
+  });
+
+  const testAlreadyLoggedIn = await testPasscode({ passcode: 'hello world'}, r3dAuthHeader);
+  t({
+    given: 'already existing credentials',
+    should: 'send 409 status',
+    actual: testAlreadyLoggedIn.statusCode,
+    expected: 409,
   });
 
   t({
     given: 'already existing credentials',
-    should: 'send 409 status & message',
-    actual: await testAlreadyLoggedIn(app),
-    expected: true,
+    should: 'send custom message',
+    actual: testAlreadyLoggedIn.message,
+    expected: 'Already Logged In',
   });
 
+  const testLoginSuccess = await testPasscode({passcode: 'hello world'}, authorizedHeader);
   t({
     given: 'valid passcode',
-    should: 'send 201 & "OK"',
-    actual: await testLoginSuccess(app),
-    expected: true,
+    should: 'send 201 status',
+    actual: testLoginSuccess.statusCode,
+    expected: 201,
   });
 
+  const newUsersObj = JSON.parse(await readFile('./users.json', { encoding: 'utf-8'}));
   t({
     given: 'valid passcode',
-    should: 'update user with "code"',
-    actual: await testUserAddedOnLogin(),
+    should: 'update user.json with "code"',
+    actual: newUsersObj[userID],
     expected: 'code',
   });
 
   t({
     given: 'a new logged in user',
     should: 'recognize user',
-    actual: await testNewLoggedInUser(app),
-    expected: true,
+    actual: getUserState(userID),
+    expected: 'code',
   });
 
   // cleanup
@@ -68,59 +104,24 @@ describe('PUT /api/auth/red33m', async t => {
   const users = JSON.parse(await readFile('./users.json', { encoding: 'utf-8'}));
   users[userID] = 'nocode';
   await writeFile('./users.json', JSON.stringify(users, null, 2));
+
+
+
+  async function testPasscode(p = {}, headers = constAuthedHeader) {
+    const { statusCode, payload } = await app.inject({
+      url,
+      method: 'PUT',
+      headers,
+      payload: p,
+    });
+    return {
+      statusCode,
+      message: (payload.includes('{')) && (JSON.parse(payload) as BadRequestSchema).message || payload
+    };
+  }
+
+
 });
-
-
-async function testRequiredPasscode(app: FastifyInstance) {
-  const { payload } = await app.inject({ url, method: 'PUT', headers: authorizedHeader });
-  return is400(payload) && payload.includes(`required property 'passcode'`);
-}
-
-
-async function testInvalidPasscode(app: FastifyInstance) {
-  const { payload } = await app.inject({ url, method: 'PUT', headers: authorizedHeader, payload: { passcode: 'asdf' }});
-  return payload.includes('Invalid Passcode') && is400(payload);
-}
-
-
-async function testEmptyPasscode(app: FastifyInstance) {
-  const  { payload } = await app.inject({ url, method: 'PUT', headers: authorizedHeader, payload: { passcode: '   ' }});
-  return is400(payload) && payload.includes('Missing Passcode');
-}
-
-
-async function testAlreadyLoggedIn(app: FastifyInstance) {
-  const { payload } = await app.inject({ url, method: 'PUT', headers: r3dAuthHeader, payload: { passcode: 'asdf' }});
-  return is409(payload) && payload.includes('Already Logged In');
-}
-
-
-async function testLoginSuccess(app: FastifyInstance) {
-  const { payload, statusCode } = await app.inject({
-    url,
-    method: 'PUT',
-    headers: authorizedHeader,
-    payload: { passcode: 'hello world' }
-  });
-  return statusCode == 201 && payload == 'OK';
-}
-
-
-async function testUserAddedOnLogin() {
-  const users = JSON.parse(await readFile('./users.json', { encoding: 'utf-8'}));
-  return users[userID];
-}
-
-
-async function testNewLoggedInUser(app: FastifyInstance) {
-  const { payload } = await app.inject({
-    url,
-    method: 'PUT',
-    headers: authorizedHeader,
-    payload: { passcode: 'hello world' }
-  });
-  return is409(payload);
-}
 
 
 

@@ -6,6 +6,7 @@ import { APIRequest } from "../../hooks/api-auth-hook";
 import * as argon from 'argon2';
 import { updateUser } from "../../database/users";
 import { serverConfig } from "../../config";
+import { defaultResponsesSchema } from "../../schemas/std-schemas";
 
 
 
@@ -22,6 +23,7 @@ const apiOptions: RouteShorthandOptions = {
       passcode: Type.String()
     }))),
     response: {
+      ...defaultResponsesSchema,
       201: Type.String(),
     },
   }
