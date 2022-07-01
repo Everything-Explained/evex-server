@@ -18,8 +18,11 @@ const app: FastifyPluginAsync<AppOptions> = async (
   // Place here your custom code!
   void fastify.register(fastifyStatic, {
     root: pathJoin(paths().web, '_data'),
+    allowedPath: (pathName, root) => {
+      return !!root?.includes('_data');
+    },
     index: false,
-    list: true,
+    serve: false,
   });
 
   // Do not touch the following lines
