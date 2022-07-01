@@ -23,13 +23,13 @@ describe('PUT /api/auth/red33m', async t => {
     actual: testRequiredPasscode.statusCode,
     expected: 400
   });
-
   t({
     given: 'no passcode',
     should: 'send custom message',
     actual: testRequiredPasscode.message,
     expected: `body must have required property 'passcode'`
   });
+
 
   const testInvalidPasscode = await testPasscode({ passcode: 'asdf'});
   t({
@@ -38,13 +38,13 @@ describe('PUT /api/auth/red33m', async t => {
     actual: testInvalidPasscode.statusCode ,
     expected: 400,
   });
-
   t({
     given: 'an invalid passcode',
     should: 'send custom message',
     actual: testInvalidPasscode.message,
     expected: 'Invalid Passcode',
   });
+
 
   const testEmptyPasscode = await testPasscode({ passcode: '        '});
   t({
@@ -53,13 +53,13 @@ describe('PUT /api/auth/red33m', async t => {
     actual: testEmptyPasscode.statusCode,
     expected: 400,
   });
-
   t({
     given: 'an empty passcode',
     should: 'send custom message',
     actual: testEmptyPasscode.message,
     expected: 'Missing Passcode',
   });
+
 
   const testAlreadyLoggedIn = await testPasscode({ passcode: 'hello world'}, r3dAuthHeader);
   t({
@@ -68,7 +68,6 @@ describe('PUT /api/auth/red33m', async t => {
     actual: testAlreadyLoggedIn.statusCode,
     expected: 409,
   });
-
   t({
     given: 'already existing credentials',
     should: 'send custom message',
@@ -76,13 +75,14 @@ describe('PUT /api/auth/red33m', async t => {
     expected: 'Already Logged In',
   });
 
-  const testLoginSuccess = await testPasscode({passcode: 'hello world'}, authorizedHeader);
+
   t({
     given: 'valid passcode',
     should: 'send 201 status',
-    actual: testLoginSuccess.statusCode,
+    actual: (await testPasscode({passcode: 'hello world'}, authorizedHeader)).statusCode,
     expected: 201,
   });
+
 
   const newUsersObj = JSON.parse(await readFile('./users.json', { encoding: 'utf-8'}));
   t({
@@ -91,7 +91,6 @@ describe('PUT /api/auth/red33m', async t => {
     actual: newUsersObj[userID],
     expected: 'code',
   });
-
   t({
     given: 'a new logged in user',
     should: 'recognize user',

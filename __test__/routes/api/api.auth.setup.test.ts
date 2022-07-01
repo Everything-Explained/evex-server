@@ -12,7 +12,7 @@ import { readFile, writeFile } from 'fs/promises';
 const url = '/api/auth/setup';
 
 
-describe('thing to test', async t => {
+describe(`POST ${url}`, async t => {
   const app = await build();
 
   const badRequest = await app.inject({ url, headers: { 'authorization': '12345'} });

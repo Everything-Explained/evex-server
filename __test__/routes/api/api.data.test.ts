@@ -84,14 +84,14 @@ describe(`GET ${url}`, async t => {
   t({
     given: '/data/file.nonSupportedExt',
     should: 'send 415 status',
-    actual: (await testParams(`${url}/blog/test.html`, 'obj')).payload.statusCode,
+    actual: (await testParams(`${url}/__mock__/test.html`, 'obj')).payload.statusCode,
     expected: 415
   });
 
   t({
     given: '/data/file.nonSupportedExt',
     should: 'send custom message',
-    actual: (await testParams(`${url}/blog/test.html`, 'obj')).payload.message,
+    actual: (await testParams(`${url}/__mock__/test.html`, 'obj')).payload.message,
     expected: 'Unsupported Request'
   });
 
@@ -111,7 +111,6 @@ describe(`GET ${url}`, async t => {
     actual: (await testParams(`${url}/__mock__/fileError.json`)).statusCode,
     expected: 500
   });
-
   t({
     given: `${mockURL}/fileError.json`,
     should: 'send error message',

@@ -53,13 +53,13 @@ describe('POST /api/form/qna', async t => {
     actual: testTooShortName.payload.statusCode,
     expected: 400
   });
-
   t({
     given: 'too short of a name',
     should: 'send custom message',
     actual: testTooShortName.payload.message,
     expected: 'Name is Invalid'
   });
+
 
   const testTooLongName = await testForm({ name: 'abcdefghijabcdefghijabcdefghijk' });
   t({
@@ -68,13 +68,13 @@ describe('POST /api/form/qna', async t => {
     actual: testTooLongName.payload.statusCode,
     expected: 400
   });
-
   t({
     given: 'too long of a name',
     should: 'send custom message',
     actual: testTooLongName.payload.message,
     expected: 'Name is Invalid'
   });
+
 
   const testNewLineName = await testForm({ name: 'ab\ncd'});
   t({
@@ -83,7 +83,6 @@ describe('POST /api/form/qna', async t => {
     actual: testNewLineName.payload.statusCode,
     expected: 400
   });
-
   t({
     given: 'new line in name',
     should: 'send custom message',
@@ -91,15 +90,14 @@ describe('POST /api/form/qna', async t => {
     expected: 'Name is Invalid'
   });
 
-  const testSpecialCharacterName = await testForm({ name: 'f**k'});
 
+  const testSpecialCharacterName = await testForm({ name: 'f**k'});
   t({
     given: 'special characters in name',
     should: 'send 400 status',
     actual: testSpecialCharacterName.payload.statusCode,
     expected: 400
   });
-
   t({
     given: 'special characters in name',
     should: 'send custom message',
@@ -107,13 +105,14 @@ describe('POST /api/form/qna', async t => {
     expected: 'Name is Invalid'
   });
 
-  const testValidName = await testForm({ name: 'Dr. Valid'}, 'string');
+
   t({
     given: 'a valid name',
     should: 'send 200 status',
-    actual: testValidName.statusCode,
+    actual: (await testForm({ name: 'Dr. Valid'}, 'string')).statusCode,
     expected: 200
   });
+
 
   const testTooShortEmailExt = await testForm({ email: 'asdf@yas.c'});
   t({
@@ -122,13 +121,13 @@ describe('POST /api/form/qna', async t => {
     actual: testTooShortEmailExt.payload.statusCode,
     expected: 400
   });
-
   t({
     given: 'too short of an email extension',
     should: 'send custom message',
     actual: testTooShortEmailExt.payload.message,
     expected: 'Invalid E-mail'
   });
+
 
   const testSpecialCharacterEmail = await testForm({ email: 'asdf*asdf@asdf.com'});
   t({
@@ -137,7 +136,6 @@ describe('POST /api/form/qna', async t => {
     actual: testSpecialCharacterEmail.payload.statusCode,
     expected: 400
   });
-
   t({
     given: 'special characters in email',
     should: 'send custom message',
@@ -145,13 +143,14 @@ describe('POST /api/form/qna', async t => {
     expected: 'Invalid E-mail'
   });
 
-  const testValidEmail = await testForm({ email: 'aEa%324-.fas@test.com'}, 'string');
+
   t({
     given: 'a valid email',
     should: 'send 200 status',
-    actual: testValidEmail.statusCode,
+    actual: (await testForm({ email: 'aEa%324-.fas@test.com'}, 'string')).statusCode,
     expected: 200
   });
+
 
   const testFormType = await testForm({ type: 7 });
   t({
@@ -167,12 +166,14 @@ describe('POST /api/form/qna', async t => {
     expected: 'Invalid Form Type'
   });
 
+
   t({
     given: 'a valid form type',
     should: 'send 200 status',
     actual: (await testForm({ type: 1}, 'string')).statusCode,
     expected: 200
   });
+
 
   const testExistingRed33mUser = await testForm({ type: 0 }, undefined, r3dAuthHeader);
   t({
@@ -181,13 +182,13 @@ describe('POST /api/form/qna', async t => {
     actual: testExistingRed33mUser.payload.statusCode,
     expected: 409
   });
-
   t({
     given: 'a red33m form type when already authed',
     should: 'send custom message',
     actual: testExistingRed33mUser.payload.message,
     expected: 'Red33m access already Granted'
   });
+
 
   const testQuestionsLength = await testForm({ questions: []});
   t({
@@ -196,13 +197,13 @@ describe('POST /api/form/qna', async t => {
     actual: testQuestionsLength.payload.statusCode,
     expected: 400
   });
-
   t({
     given: 'no questions',
     should: 'send custom message',
     actual: testQuestionsLength.payload.message,
     expected: 'Invalid Questions'
   });
+
 
   const testEmptyAnswer = await testForm({
     questions: [
@@ -216,13 +217,13 @@ describe('POST /api/form/qna', async t => {
     actual: testEmptyAnswer.payload.statusCode,
     expected: 400
   });
-
   t({
     given: 'an empty answer',
     should: 'send custom message',
     actual: testEmptyAnswer.payload.message,
     expected: 'Invalid Questions'
   });
+
 
   const testEmptyQuestionText = await testForm({
     questions: [
@@ -236,13 +237,13 @@ describe('POST /api/form/qna', async t => {
     actual: testEmptyQuestionText.payload.statusCode,
     expected: 400
   });
-
   t({
     given: 'empty question text',
     should: 'send custom message',
     actual: testEmptyQuestionText.payload.message,
     expected: 'Invalid Questions'
   });
+
 
   const testQuestionTextTooShort = await testForm({
     questions: [
@@ -256,13 +257,13 @@ describe('POST /api/form/qna', async t => {
     actual: testQuestionTextTooShort.payload.statusCode,
     expected: 400
   });
-
   t({
     given: 'question text that is too short',
     should: 'send 400 status & message',
     actual: testQuestionTextTooShort.payload.message,
     expected: 'Invalid Questions'
   });
+
 
   const testAnswerTooShort = await testForm({
     questions: [
@@ -276,13 +277,13 @@ describe('POST /api/form/qna', async t => {
     actual: testAnswerTooShort.payload.statusCode,
     expected: 400
   });
-
   t({
     given: 'an answer that is too short',
     should: 'send custom message',
     actual: testAnswerTooShort.payload.message,
     expected: 'Invalid Questions'
   });
+
 
   const testTooShortRed33mAnswer = await testForm({
     type: 0,
@@ -301,13 +302,13 @@ describe('POST /api/form/qna', async t => {
     actual: testTooShortRed33mAnswer.payload.statusCode,
     expected: 400
   });
-
   t({
     given: 'an answer too short for red33m form type',
     should: 'send custom message',
     actual: testTooShortRed33mAnswer.payload.message,
     expected: 'Invalid Questions'
   });
+
 
   t({
     given: 'valid questions',
@@ -316,6 +317,7 @@ describe('POST /api/form/qna', async t => {
     expected: 200
   });
 
+
   const testFormError = await testForm({ name: 'throwError' });
   t({
     given: 'an error response from transport',
@@ -323,7 +325,6 @@ describe('POST /api/form/qna', async t => {
     actual: testFormError.payload.statusCode,
     expected: 500
   });
-
   t({
     given: 'an error response from transport',
     should: 'send custom message',
