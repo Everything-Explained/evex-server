@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import { IncomingHttpHeaders } from "http";
 import { describe } from "riteway";
 import { build, userID } from "../test.fastify";
 
@@ -14,84 +14,55 @@ describe('/api auth hook', async t => {
   t({
     given: 'missing auth header',
     should: 'send 401 status',
-    actual: await testMissingAuthHeader(app),
+    actual: (await testHeader(url, {})),
     expected: 401,
   });
 
   t({
     given: '"Bearer" missing in auth header',
     should: 'send 401 status',
-    actual: await testMissingAuthBearer(app),
+    actual: (await testHeader(url, { 'authorization': 'asdf' })),
     expected: 401,
   });
 
   t({
     given: 'a missing Bearer token',
     should: 'send 401 status',
-    actual: await testMissingAuthToken(app),
+    actual: (await testHeader(url, { 'authorization': 'Bearer' })),
     expected: 401,
   });
 
   t({
     given: 'a Bearer token length < 20',
     should: 'send 401 status',
-    actual: await testAuthTokenLength(app),
+    actual: (await testHeader(url, { 'authorization': 'Bearer NotLongEnough' })),
     expected: 401,
   });
 
   t({
     given: 'an authenticated Bearer token',
     should: 'goto next route handler',
-    actual: await testValidAuth(app),
+    actual: (await testHeader(`${url}/should404`, { 'authorization': `Bearer ${userID}` })),
     expected: 403,
   });
 
   t({
     given: 'an unauthorized /auth/setup url',
     should: 'skip auth check',
-    actual: await testAuthSetupCondition(app),
+    actual: (await testHeader(`${url}/auth/setup`, { 'authorization': 'Bearer blah' })),
     expected: 400,
   });
 
 
+  // Cleanup below here
   app.close();
+
+
+  async function testHeader(url: string, headers: IncomingHttpHeaders) {
+    const { statusCode } = await app.inject({ url, headers, });
+    return statusCode;
+  }
 });
-
-
-async function testMissingAuthHeader(app: FastifyInstance) {
-  const { statusCode } = await app.inject({ url, });
-  return statusCode;
-}
-
-
-async function testMissingAuthBearer(app: FastifyInstance) {
- const { statusCode } = await app.inject({ url: '/api', headers: { 'authorization': 'asdf' }});
- return statusCode;
-}
-
-
-async function testMissingAuthToken(app: FastifyInstance) {
- const { statusCode } = await app.inject({ url: '/api', headers: { 'authorization': 'Bearer' } });
- return statusCode;
-}
-
-
-async function testAuthTokenLength(app: FastifyInstance) {
-  const { statusCode } = await app.inject({ url: '/api', headers: { 'authorization': 'Bearer NotLongEnough' } });
-  return statusCode;
-}
-
-
-async function testValidAuth(app: FastifyInstance) {
-  const { statusCode } = await app.inject({ url: '/api/should404', headers: { 'authorization': `Bearer ${userID}` } });
-  return statusCode;
-}
-
-
-async function testAuthSetupCondition(app: FastifyInstance) {
-  const { statusCode } = await app.inject({ url: '/api/auth/setup', headers: { 'authorization': `Bearer blah` } });
-  return statusCode;
-}
 
 
 
