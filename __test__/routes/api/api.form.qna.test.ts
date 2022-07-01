@@ -4,6 +4,7 @@ import { describe } from 'riteway';
 import { build, constAuthedHeader, r3dAuthHeader } from '../../test.fastify';
 import { QnAFormReqBody, _tdd_testAPIFormQna } from '../../../src/routes/api/api-form-qna';
 import { serverConfig } from '../../../src/config';
+import { BadRequestSchema } from '../../../src/schemas/std-schemas';
 
 
 
@@ -45,137 +46,289 @@ describe('POST /api/form/qna', async t => {
   const app = await build();
   tdd.setDevTransport();
 
+  const testTooShortName = await testForm({ name: 'a' });
   t({
     given: 'too short of a name',
-    should: 'send 400 status & message',
-    actual: await testTooShortName(),
-    expected: true
+    should: 'send 400 status',
+    actual: testTooShortName.payload.statusCode,
+    expected: 400
+  });
+
+  t({
+    given: 'too short of a name',
+    should: 'send custom message',
+    actual: testTooShortName.payload.message,
+    expected: 'Name is Invalid'
+  });
+
+  const testTooLongName = await testForm({ name: 'abcdefghijabcdefghijabcdefghijk' });
+  t({
+    given: 'too long of a name',
+    should: 'send 400 status',
+    actual: testTooLongName.payload.statusCode,
+    expected: 400
   });
 
   t({
     given: 'too long of a name',
-    should: 'send 400 status & message',
-    actual: await testTooLongName(),
-    expected: true
+    should: 'send custom message',
+    actual: testTooLongName.payload.message,
+    expected: 'Name is Invalid'
+  });
+
+  const testNewLineName = await testForm({ name: 'ab\ncd'});
+  t({
+    given: 'new line in name',
+    should: 'send 400 status',
+    actual: testNewLineName.payload.statusCode,
+    expected: 400
   });
 
   t({
     given: 'new line in name',
-    should: 'send 400 status & message',
-    actual: await testNewLineName(),
-    expected: true
+    should: 'send custom message',
+    actual: testNewLineName.payload.message,
+    expected: 'Name is Invalid'
+  });
+
+  const testSpecialCharacterName = await testForm({ name: 'f**k'});
+
+  t({
+    given: 'special characters in name',
+    should: 'send 400 status',
+    actual: testSpecialCharacterName.payload.statusCode,
+    expected: 400
   });
 
   t({
     given: 'special characters in name',
-    should: 'send 400 status & message',
-    actual: await testSpecialCharacterName(),
-    expected: true
+    should: 'send custom message',
+    actual: testSpecialCharacterName.payload.message,
+    expected: 'Name is Invalid'
   });
 
+  const testValidName = await testForm({ name: 'Dr. Valid'}, 'string');
   t({
     given: 'a valid name',
     should: 'send 200 status',
-    actual: await testValidName(),
+    actual: testValidName.statusCode,
     expected: 200
+  });
+
+  const testTooShortEmailExt = await testForm({ email: 'asdf@yas.c'});
+  t({
+    given: 'too short of an email extension',
+    should: 'send 400 status',
+    actual: testTooShortEmailExt.payload.statusCode,
+    expected: 400
   });
 
   t({
     given: 'too short of an email extension',
-    should: 'send 400 status & message',
-    actual: await testTooShortEmailExt(),
-    expected: true
+    should: 'send custom message',
+    actual: testTooShortEmailExt.payload.message,
+    expected: 'Invalid E-mail'
+  });
+
+  const testSpecialCharacterEmail = await testForm({ email: 'asdf*asdf@asdf.com'});
+  t({
+    given: 'special characters in email',
+    should: 'send 400 status',
+    actual: testSpecialCharacterEmail.payload.statusCode,
+    expected: 400
   });
 
   t({
     given: 'special characters in email',
-    should: 'send 400 status & message',
-    actual: await testSpecialCharacterEmail(),
-    expected: true
+    should: 'send custom message',
+    actual: testSpecialCharacterEmail.payload.message,
+    expected: 'Invalid E-mail'
   });
 
+  const testValidEmail = await testForm({ email: 'aEa%324-.fas@test.com'}, 'string');
   t({
     given: 'a valid email',
     should: 'send 200 status',
-    actual: await testValidEmail(),
+    actual: testValidEmail.statusCode,
     expected: 200
   });
 
+  const testFormType = await testForm({ type: 7 });
   t({
     given: 'a non-existent form type',
-    should: 'send 400 status & message',
-    actual: await testFormType(),
-    expected: true
+    should: 'send 400 status',
+    actual: testFormType.payload.statusCode,
+    expected: 400
+  });
+  t({
+    given: 'a non-existent form type',
+    should: 'send custom message',
+    actual: testFormType.payload.message,
+    expected: 'Invalid Form Type'
   });
 
   t({
     given: 'a valid form type',
     should: 'send 200 status',
-    actual: await testValidFormType(),
+    actual: (await testForm({ type: 1}, 'string')).statusCode,
     expected: 200
   });
 
+  const testExistingRed33mUser = await testForm({ type: 0 }, undefined, r3dAuthHeader);
   t({
-    given: 'a red33m form type, but already a red33m user',
-    should: 'send 409 status & message',
-    actual: await testExistingRed33mUser(),
-    expected: true
+    given: 'a red33m form type when already authed',
+    should: 'send 409 status',
+    actual: testExistingRed33mUser.payload.statusCode,
+    expected: 409
+  });
+
+  t({
+    given: 'a red33m form type when already authed',
+    should: 'send custom message',
+    actual: testExistingRed33mUser.payload.message,
+    expected: 'Red33m access already Granted'
+  });
+
+  const testQuestionsLength = await testForm({ questions: []});
+  t({
+    given: 'no questions',
+    should: 'send 400 status',
+    actual: testQuestionsLength.payload.statusCode,
+    expected: 400
   });
 
   t({
     given: 'no questions',
-    should: 'send 400 status & message',
-    actual: await testQuestionsLength(),
-    expected: true
+    should: 'send custom message',
+    actual: testQuestionsLength.payload.message,
+    expected: 'Invalid Questions'
+  });
+
+  const testEmptyAnswer = await testForm({
+    questions: [
+      { text: validForm.questions[0].text, answer: '           '},
+      validForm.questions[1]
+    ]
+  });
+  t({
+    given: 'an empty answer',
+    should: 'send 400 status',
+    actual: testEmptyAnswer.payload.statusCode,
+    expected: 400
   });
 
   t({
     given: 'an empty answer',
-    should: 'send 400 status & message',
-    actual: await testEmptyAnswer(),
-    expected: true
+    should: 'send custom message',
+    actual: testEmptyAnswer.payload.message,
+    expected: 'Invalid Questions'
+  });
+
+  const testEmptyQuestionText = await testForm({
+    questions: [
+      { text: '        ', answer: validForm.questions[0].answer},
+      validForm.questions[1]
+    ]
+  });
+  t({
+    given: 'empty question text',
+    should: 'send 400 status',
+    actual: testEmptyQuestionText.payload.statusCode,
+    expected: 400
   });
 
   t({
     given: 'empty question text',
-    should: 'send 400 status & message',
-    actual: await testEmptyQuestionText(),
-    expected: true
+    should: 'send custom message',
+    actual: testEmptyQuestionText.payload.message,
+    expected: 'Invalid Questions'
+  });
+
+  const testQuestionTextTooShort = await testForm({
+    questions: [
+      { text: 'hello world', answer: validForm.questions[0].answer},
+      validForm.questions[1]
+    ]
+  });
+  t({
+    given: 'question text that is too short',
+    should: 'send 400 status',
+    actual: testQuestionTextTooShort.payload.statusCode,
+    expected: 400
   });
 
   t({
     given: 'question text that is too short',
     should: 'send 400 status & message',
-    actual: await testQuestionTextTooShort(),
-    expected: true
+    actual: testQuestionTextTooShort.payload.message,
+    expected: 'Invalid Questions'
+  });
+
+  const testAnswerTooShort = await testForm({
+    questions: [
+      { text: validForm.questions[0].text, answer: 'hello world'},
+      validForm.questions[1]
+    ]
+  });
+  t({
+    given: 'an answer that is too short',
+    should: 'send 400 status',
+    actual: testAnswerTooShort.payload.statusCode,
+    expected: 400
   });
 
   t({
     given: 'an answer that is too short',
-    should: 'send 400 status & message',
-    actual: await testAnswerTooShort(),
-    expected: true
+    should: 'send custom message',
+    actual: testAnswerTooShort.payload.message,
+    expected: 'Invalid Questions'
+  });
+
+  const testTooShortRed33mAnswer = await testForm({
+    type: 0,
+    questions: [
+      {
+        text: validForm.questions[0].text,
+        answer: 'This answer is definitely too short for a red33m form because that is how its designed \
+                 to be'
+      },
+      validForm.questions[1]
+    ]
+  });
+  t({
+    given: 'an answer too short for red33m form type',
+    should: 'send 400 status',
+    actual: testTooShortRed33mAnswer.payload.statusCode,
+    expected: 400
   });
 
   t({
     given: 'an answer too short for red33m form type',
-    should: 'send 400 status & message',
-    actual: await testAnswerTooShortRed33m(),
-    expected: true
+    should: 'send custom message',
+    actual: testTooShortRed33mAnswer.payload.message,
+    expected: 'Invalid Questions'
   });
 
   t({
     given: 'valid questions',
     should: 'send 200 status',
-    actual: await testValidQuestions(),
+    actual: (await testForm({}, 'string')).statusCode,
     expected: 200
+  });
+
+  const testFormError = await testForm({ name: 'throwError' });
+  t({
+    given: 'an error response from transport',
+    should: 'send 500 status',
+    actual: testFormError.payload.statusCode,
+    expected: 500
   });
 
   t({
     given: 'an error response from transport',
-    should: 'send 500 status & message',
-    actual: await testErrorHandler(),
-    expected: true
+    should: 'send custom message',
+    actual: testFormError.payload.message,
+    expected: `I'm a bad boy!`
   });
 
 
@@ -186,182 +339,20 @@ describe('POST /api/form/qna', async t => {
   //############################
   //###### TEST FUNCTIONS ######
   //############################
-  async function testTooShortName() {
-    const nameTooShortForm = getForm({ name: 'a'});
+  type TestResp<T> = { statusCode: number; payload: T };
+
+  async function testForm(formData: {[key: string]: any}): Promise<TestResp<BadRequestSchema>>
+  async function testForm(formData: {[key: string]: any}, type: 'string'): Promise<TestResp<string>>
+  async function testForm(formData: {[key: string]: any}, type: undefined, header: typeof constAuthedHeader): Promise<TestResp<BadRequestSchema>>
+  async function testForm(formData: {[key: string]: any}, type?: 'string', header = constAuthedHeader) {
+    const form = getForm(formData);
     const { payload, statusCode } =
-      await app.inject({ url, method: 'POST', payload: nameTooShortForm, headers: constAuthedHeader })
+      await app.inject({ url, method: 'POST', payload: form, headers: header })
     ;
-    return payload.includes('Name is Invalid') && statusCode == 400;
-  }
-
-
-  async function testTooLongName() {
-    const form = getForm({ name: 'abcdefghijabcdefghijabcdefghijk'});
-    const { payload, statusCode } =
-      await app.inject({ url, method: 'POST', payload: form, headers: constAuthedHeader })
-    ;
-    return payload.includes('Name is Invalid') && statusCode == 400;
-  }
-
-
-  async function testNewLineName() {
-    const form = getForm({ name: 'ab\ncd'});
-    const { payload, statusCode } =
-      await app.inject({ url, method: 'POST', payload: form, headers: constAuthedHeader })
-    ;
-    return payload.includes('Name is Invalid') && statusCode == 400;
-  }
-
-
-  async function testSpecialCharacterName() {
-    const form = getForm({ name: '@biggie@test.com'});
-    const { payload, statusCode } =
-      await app.inject({ url, method: 'POST', payload: form, headers: constAuthedHeader })
-    ;
-    return payload.includes('Name is Invalid') && statusCode == 400;
-  }
-
-
-  async function testValidName() {
-    const newLineNameForm = getForm({ name: 'Mr. Lambdadoodle'});
-    const { statusCode } =
-      await app.inject({ url, method: 'POST', payload: newLineNameForm, headers: constAuthedHeader })
-    ;
-    return statusCode;
-  }
-
-
-  async function testTooShortEmailExt() {
-    const form = getForm({ email: 'asdf@yas.c'});
-    const { payload, statusCode } =
-      await app.inject({ url, method: 'POST', payload: form, headers: constAuthedHeader })
-    ;
-    return payload.includes('Invalid E-mail') && statusCode == 400;
-  }
-
-
-  async function testSpecialCharacterEmail() {
-    const form = getForm({ email: 'as/df@yas.con'});
-    const { payload, statusCode } =
-      await app.inject({ url, method: 'POST', payload: form, headers: constAuthedHeader })
-    ;
-    return payload.includes('Invalid E-mail') && statusCode == 400;
-  }
-
-
-  async function testValidEmail() {
-    const form = getForm({ email: 'aEa%324-.fas@test.com'});
-    const { statusCode } =
-      await app.inject({ url, method: 'POST', payload: form, headers: constAuthedHeader })
-    ;
-    return statusCode;
-  }
-
-
-  async function testFormType() {
-    const form = getForm({ type: 7});
-    const { payload, statusCode } =
-      await app.inject({ url, method: 'POST', payload: form, headers: constAuthedHeader })
-    ;
-    return payload.includes('Invalid Form Type') && statusCode == 400;
-  }
-
-
-  async function testValidFormType() {
-    const form = getForm({ type: 1 });
-    const { statusCode } =
-      await app.inject({ url, method: 'POST', payload: form, headers: constAuthedHeader })
-    ;
-    return statusCode;
-  }
-
-
-  async function testExistingRed33mUser() {
-    const form = getForm({ type: 0 });
-    const { payload, statusCode } =
-      await app.inject({ url, method: 'POST', payload: form, headers: r3dAuthHeader })
-    ;
-    return payload.includes('access already Granted') && statusCode == 409;
-  }
-
-
-  async function testQuestionsLength() {
-    const form = getForm({ questions: []});
-    const { payload, statusCode } =
-      await app.inject({ url, method: 'POST', payload: form, headers: constAuthedHeader })
-    ;
-    return payload.includes('Invalid Questions') && statusCode == 400;
-  }
-
-
-  async function testEmptyAnswer() {
-    const form = getForm();
-    form.questions[0].answer = '         ';
-    const { payload, statusCode } =
-      await app.inject({ url, method: 'POST', payload: form, headers: constAuthedHeader })
-    ;
-    return payload.includes('Invalid Questions') && statusCode == 400;
-  }
-
-
-  async function testEmptyQuestionText() {
-    const form = getForm();
-    form.questions[0].text = '         ';
-    const { payload, statusCode } =
-      await app.inject({ url, method: 'POST', payload: form, headers: constAuthedHeader })
-    ;
-    return payload.includes('Invalid Questions') && statusCode == 400;
-  }
-
-
-  async function testQuestionTextTooShort() {
-    const form = getForm();
-    form.questions[0].text = 'hello world';
-    const { payload, statusCode } =
-      await app.inject({ url, method: 'POST', payload: form, headers: constAuthedHeader })
-    ;
-    return payload.includes('Invalid Questions') && statusCode == 400;
-  }
-
-
-  async function testAnswerTooShort() {
-    const form = getForm();
-    form.questions[0].answer = 'hello there this is definitely too short of an answer!';
-    const { payload, statusCode } =
-      await app.inject({ url, method: 'POST', payload: form, headers: constAuthedHeader })
-    ;
-    return payload.includes('Invalid Questions') && statusCode == 400;
-  }
-
-
-  async function testAnswerTooShortRed33m() {
-    const form = getForm({ type: 0 });
-    form.questions[0].answer =
-      'This answer is definitely too short for a red33m form because that is how its designed \
-      to be';
-    const { payload, statusCode } =
-      await app.inject({ url, method: 'POST', payload: form, headers: constAuthedHeader })
-    ;
-    return payload.includes('Invalid Questions') && statusCode == 400;
-  }
-
-
-  async function testValidQuestions() {
-    const form = getForm();
-    const { statusCode } =
-      await app.inject({ url, method: 'POST', payload: form, headers: constAuthedHeader })
-    ;
-    return statusCode;
-  }
-
-
-  async function testErrorHandler() {
-    // Built into mock-mailer to throw error with this name
-    const form = getForm({ name: 'throwError'});
-    const { payload, statusCode } =
-      await app.inject({ url, method: 'POST', payload: form, headers: constAuthedHeader })
-    ;
-    return payload.includes('bad boy') && statusCode == 500;
+    return {
+      statusCode,
+      payload: type == 'string' && payload || JSON.parse(payload) as BadRequestSchema,
+    };
   }
 
 });
