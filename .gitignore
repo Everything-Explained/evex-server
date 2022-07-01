@@ -5,6 +5,7 @@ npm-debug.log*
 
 # Private files
 config.json
+scratch.ts
 
 # Runtime data
 pids
