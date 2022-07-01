@@ -26,6 +26,7 @@
     "nodemailer": "^6.7.5"
   },
   "devDependencies": {
+    "@types/fs-ext": "^2.0.0",
     "@types/node": "^17.0.8",
     "@types/nodemailer": "^6.4.4",
     "@types/tap": "^15.0.5",
@@ -36,6 +37,7 @@
     "eslint": "^8.17.0",
     "eslint-config-standard": "^17.0.0",
     "fastify-tsconfig": "^1.0.1",
+    "fs-ext": "^2.0.0",
     "nyc": "^15.1.0",
     "riteway": "^6.3.1",
     "tap-nirvana": "^1.1.0",

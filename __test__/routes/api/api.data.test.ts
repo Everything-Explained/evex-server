@@ -1,134 +1,140 @@
 
 
 import { describe } from 'riteway';
-import { authorizedHeader, build } from '../../test.fastify';
-import { FastifyInstance } from 'fastify';
+import { build, constAuthedHeader } from '../../test.fastify';
+import { BadRequestSchema } from '../../../src/schemas/std-schemas';
+import * as fs from 'fs-ext';
+import { openSync } from 'fs';
+import { paths } from '../../../src/config';
+import { pathJoin } from '../../../src/utils';
 
+
+
+type StringPayload = {
+  statusCode: number;
+  payload: {
+    hello: string;
+  }
+}
+
+type BadReqPayload = {
+  statusCode: number;
+  payload: BadRequestSchema
+}
 
 
 
 const url = '/api/data';
+const mockURL = '/_data/__mock__';
 
 
-describe('GET /api/data', async t => {
+describe(`GET ${url}`, async t => {
   const app = await build();
 
+  const testNoParams = await testParams(url);
   t({
     given: '/data',
     should: 'send 403 status',
-    actual: await testNoParams(app),
+    actual: testNoParams.statusCode,
     expected: 403
   });
 
   t({
-    given: '/data/dir',
-    should: 'send /data/dir/dir.json',
-    actual: await testSingleParamNoExt(app),
-    expected: true
+    given: '/data/mock.json',
+    should: 'send mock.json',
+    actual: (await testParams(`${url}/mock.json`)).payload.hello,
+    expected: 'singleParamWithExt'
   });
 
   t({
-    given: '/data/file.json',
-    should: 'send /data/file.json',
-    actual: await testSingleParamExt(app),
-    expected: true
+    given: `${mockURL}`,
+    should: 'send ../__mock__/__mock__.json',
+    actual: (await testParams(`${url}/__mock__`)).payload.hello,
+    expected: 'singleParamNoExt'
   });
 
   t({
-    given: '/data/dir/dir',
-    should: 'send /data/dir/dir/dir.json',
-    actual: await testDoubleParamNoExt(app),
-    expected: true
+    given: `${mockURL}/file.json`,
+    should: 'send file.json',
+    actual: (await testParams(`${url}/__mock__/file.json`)).payload.hello,
+    expected: 'doubleParamWithExt'
   });
 
   t({
-    given: '/data/dir/file.json',
-    should: 'send /data/dir/file.json',
-    actual: await testDoubleParamExt(app),
-    expected: true
+    given: `${mockURL}/mock`,
+    should: 'send ../mock/mock.json',
+    actual: (await testParams(`${url}/__mock__/mock`)).payload.hello,
+    expected: 'doubleParamNoExt'
   });
 
   t({
-    given: '/data/dir/dir/file.json',
-    should: 'send /data/dir/dir/file.json',
-    actual: await testTripleParamExt(app),
-    expected: true
+    given: `${mockURL}/mdhtmlFile.mdhtml`,
+    should: `send mdhtmlFile.mdhtml`,
+    actual: (await testParams(`${url}/__mock__/mdhtmlFile.mdhtml`)).payload.hello,
+    expected: 'mdhtmlFile'
   });
 
   t({
-    given: '/data/dir/file.mdhtml',
-    should: 'send /data/dir/file.mdhtml',
-    actual: await testMDHTML(app),
-    expected: true
+    given: `${mockURL}/mock/file.json`,
+    should: 'send ../mock/file.json',
+    actual: (await testParams(`${url}/__mock__/mock/file.json`)).payload.hello,
+    expected: 'tripleParamWithExt'
   });
 
   t({
     given: '/data/file.nonSupportedExt',
-    should: 'send 415 status & message',
-    actual: await testUnsupportedExt(app),
-    expected: true
+    should: 'send 415 status',
+    actual: (await testParams(`${url}/blog/test.html`, 'obj')).payload.statusCode,
+    expected: 415
+  });
+
+  t({
+    given: '/data/file.nonSupportedExt',
+    should: 'send custom message',
+    actual: (await testParams(`${url}/blog/test.html`, 'obj')).payload.message,
+    expected: 'Unsupported Request'
   });
 
   t({
     given: '/data/fileNotExist.json',
-    should: 'send 404 status & message',
-    actual: await testFileNotFound(app),
-    expected: true
+    should: 'send 404 status',
+    actual: (await testParams(`${url}/fileNotExist.json`)).statusCode,
+    expected: 404
   });
 
+  const webPath = pathJoin(paths().web, mockURL, 'fileError.json');
+  const fd = openSync(webPath, 'r');
+  fs.flockSync(fd, 'ex');
+  t({
+    given: `${mockURL}/fileError.json`,
+    should: 'send 500 status',
+    actual: (await testParams(`${url}/__mock__/fileError.json`)).statusCode,
+    expected: 500
+  });
+
+  t({
+    given: `${mockURL}/fileError.json`,
+    should: 'send error message',
+    actual: (await testParams(`${url}/__mock__/fileError.json`, 'obj')).payload.message,
+    expected: 'EBUSY: resource busy or locked, read'
+  });
 
   // Cleanup everything here
   app.close();
 
+
+
+  async function testParams(url: string): Promise<StringPayload>
+  async function testParams(url: string, payloadType: 'obj'): Promise<BadReqPayload>
+  async function testParams(url: string, payloadType?: 'obj') {
+    const { payload, statusCode } = await app.inject({ url, headers: constAuthedHeader });
+    return {
+      statusCode,
+      payload: payloadType == 'obj' && JSON.parse(payload) as BadRequestSchema || JSON.parse(payload) as { hello: string }
+    };
+  }
+
 });
-
-
-async function testNoParams(app: FastifyInstance) {
-  const { statusCode } = await app.inject({ url, headers: authorizedHeader });
-  return statusCode;
-}
-
-async function testSingleParamNoExt(app: FastifyInstance) {
-  const { payload, statusCode } = await app.inject({ url: `${url}/blog`, headers: authorizedHeader });
-  return statusCode == 200 && typeof payload == 'string' && payload.length > 200;
-}
-
-async function testSingleParamExt(app: FastifyInstance) {
-  const { payload, statusCode } = await app.inject({ url: `${url}/versions.json`, headers: authorizedHeader });
-  return statusCode == 200 && typeof payload == 'string' && payload.length > 200;
-}
-
-async function testDoubleParamNoExt(app: FastifyInstance) {
-  const { payload, statusCode } = await app.inject({ url: `${url}/videos/public`, headers: authorizedHeader });
-  return statusCode == 200 && typeof payload == 'string' && payload.length > 200;
-}
-
-async function testDoubleParamExt(app: FastifyInstance) {
-  const { payload, statusCode } = await app.inject({ url: `${url}/blog/blog.json`, headers: authorizedHeader });
-  return statusCode == 200 && typeof payload == 'string' && payload.length > 200;
-}
-
-async function testTripleParamExt(app: FastifyInstance) {
-  const { payload, statusCode } = await app.inject({ url: `${url}/literature/public/147769512.mdhtml`, headers: authorizedHeader });
-  return statusCode == 200 && typeof payload == 'string' && payload.length > 300;
-}
-
-async function testMDHTML(app: FastifyInstance) {
-  const { payload, statusCode } = await app.inject({ url: `${url}/blog/32167398.mdhtml`, headers: authorizedHeader });
-  return statusCode == 200 && typeof payload == 'string' && payload.length > 300;
-}
-
-async function testUnsupportedExt(app: FastifyInstance) {
-  const { payload, statusCode } = await app.inject({ url: `${url}/blog/test.html`, headers: authorizedHeader });
-  return statusCode == 415 && payload.includes('Unsupported');
-}
-
-async function testFileNotFound(app: FastifyInstance) {
-  const { payload, statusCode } = await app.inject({ url: `${url}/fileNotExist.json`, headers: authorizedHeader });
-  return statusCode == 404 && payload.includes('Not Found');
-}
-
-
 
 
 
