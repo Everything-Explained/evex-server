@@ -1,9 +1,8 @@
 
 
 import { FastifyInstance, FastifyReply } from "fastify";
-import { readFile } from "fs/promises";
 import { paths } from "../../config";
-import { pathExtname, pathJoin, tryCatchPromise } from "../../utils";
+import { pathExtname, pathJoin } from "../../utils";
 
 
 
@@ -43,13 +42,12 @@ async function getPageData(params: object, res: FastifyReply) {
   const path = getFilePathFromParams(params);
 
   if (pathExtname(path) == '.json') {
-    res.header('Content-Type', 'application/json; charset=utf-8');
-    return await tryReadFile(pathJoin(dataDir, path), res);
+    return res.sendFile(path, dataDir);
   }
 
   if (pathExtname(path) == '.mdhtml') {
     res.header('Content-Type', 'text/html; charset=utf-8');
-    return await tryReadFile(pathJoin(dataDir, path), res);
+    return res.sendFile(path, dataDir);
   }
 
   return res.unsupportedMediaType('Unsupported Request');
@@ -73,20 +71,6 @@ function getFilePathFromParams(params: object) {
   }
 
   return uri;
-}
-
-
-async function tryReadFile(path: string, res: FastifyReply) {
-  const fileResp = await tryCatchPromise(readFile(path, { encoding: 'utf-8' }));
-
-  if (fileResp instanceof Error) {
-    if (fileResp.message.includes('ENOENT')) {
-      return res.notFound();
-    }
-    return res.internalServerError(fileResp.message);
-  }
-
-  return fileResp;
 }
 
 

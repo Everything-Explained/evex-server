@@ -18,6 +18,7 @@
   "dependencies": {
     "@fastify/autoload": "^5.0.0",
     "@fastify/sensible": "^4.1.0",
+    "@fastify/static": "^6.4.0",
     "@sinclair/typebox": "^0.23.5",
     "argon2": "^0.28.5",
     "fastify": "^4.0.0",
