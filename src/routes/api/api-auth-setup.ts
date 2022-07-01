@@ -1,14 +1,14 @@
 
 import { Type } from "@sinclair/typebox";
 import { FastifyInstance, RouteShorthandOptions } from "fastify";
-import { readFile } from "fs/promises";
 import { paths } from "../../config";
 import { addUser } from "../../database/users";
 import { APIRequest } from "../../hooks/api-auth-hook";
+import { pathJoin } from "../../utils";
 
 
 
-const webPath = paths().web;
+const dataPath = pathJoin(paths().web, '_data');
 const authSetupSchema: RouteShorthandOptions = {
   schema: {
     response: {
@@ -33,9 +33,7 @@ const useAuthSetupRoute = (fastify: FastifyInstance, rootURl: string) => {
       res.code(201);
     }
 
-    return (
-      await readFile(`${webPath}/_data/versions.json`, { encoding: 'utf-8'})
-    );
+    return res.sendFile('/versions.json', dataPath);
   });
 };
 
