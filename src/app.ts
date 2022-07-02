@@ -5,6 +5,7 @@ import api from './routes/api/api';
 import fastifyStatic from '@fastify/static';
 import { paths } from './config';
 import { pathJoin } from './utils';
+import root from './routes/root';
 
 export type AppOptions = {
   // Place your custom options for app below here.
@@ -15,12 +16,23 @@ const app: FastifyPluginAsync<AppOptions> = async (
     opts
 ): Promise<void> => {
 
-  // Place here your custom code!
+  // All registered static URLs must follow
+  // a specific registration path
+  // /root
+  // /root/nextRoot
+  // /root/nextRoot/anotherRoot
+
+  void fastify.register(fastifyStatic, {
+    root: paths().web,
+    serve: false,
+  });
+
   void fastify.register(fastifyStatic, {
     root: pathJoin(paths().web, '_data'),
     allowedPath: (pathName, root) => {
       return !!root?.includes('_data');
     },
+    decorateReply: false,
     index: false,
     serve: false,
   });
@@ -35,13 +47,8 @@ const app: FastifyPluginAsync<AppOptions> = async (
     options: opts
   });
 
-  // This loads all plugins defined in routes
-  // void fastify.register(AutoLoad, {
-  //   dir: join(__dirname, 'routes'),
-  //   options: opts
-  // });
-
   void fastify.register(api, opts);
+  void fastify.register(root, opts);
 
 };
 
