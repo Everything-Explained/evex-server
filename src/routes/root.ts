@@ -1,4 +1,4 @@
-import { FastifyPluginAsync } from 'fastify'
+import { FastifyPluginAsync } from 'fastify';
 import { paths } from '../config';
 import { pathExtname } from '../utils';
 

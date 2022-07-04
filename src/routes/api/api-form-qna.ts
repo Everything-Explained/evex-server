@@ -7,7 +7,6 @@ import Mail = require("nodemailer/lib/mailer");
 import { inDev, serverConfig } from "../../config";
 import { APIRequest } from "../../hooks/api-auth-hook";
 import { defaultResponsesSchema } from "../../schemas/std-schemas";
-import { Mailtrap, Sendinblue } from "../../types/private-config";
 import { tryCatchPromise } from "../../utils";
 
 
