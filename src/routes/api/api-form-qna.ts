@@ -4,7 +4,6 @@ import { Static, Type } from "@sinclair/typebox";
 import { FastifyInstance, FastifyReply, RouteShorthandOptions } from "fastify";
 import * as mailer from 'nodemailer';
 import Mail = require("nodemailer/lib/mailer");
-import { mockTransport } from "../../../__test__/helpers/mock-mail";
 import { inDev, serverConfig } from "../../config";
 import { APIRequest } from "../../hooks/api-auth-hook";
 import { defaultResponsesSchema } from "../../schemas/std-schemas";
@@ -50,8 +49,6 @@ const state = {
   transport: mailer.createTransport(
     inDev && config.mail.mailtrap || config.mail.sendinblue
   )
-} as {
-  transport: mailer.Transporter|typeof mockTransport
 };
 
 enum FormType {
@@ -178,7 +175,7 @@ export const _tdd_testAPIFormQna = {
   createEmail,
   buildHTMLMsg,
   buildTextMsg,
-  setDevTransport: () => state.transport = mockTransport,
+  setDevTransport: (transport: any) => state.transport = transport,
 };
 
 

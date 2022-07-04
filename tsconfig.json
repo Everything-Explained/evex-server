@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "dist",
     "sourceMap": true,
-    "noEmitOnError": false
+    "noEmitOnError": false,
+    "declaration": false
   },
-  "include": ["src/**/*.ts", "__test__/helpers/mock-mail.ts"]
+  "include": ["src/**/*.ts"]
 }

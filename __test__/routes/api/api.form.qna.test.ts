@@ -5,6 +5,7 @@ import { build, constAuthedHeader, r3dAuthHeader } from '../../test.fastify';
 import { QnAFormReqBody, _tdd_testAPIFormQna } from '../../../src/routes/api/api-form-qna';
 import { serverConfig } from '../../../src/config';
 import { BadRequestSchema } from '../../../src/schemas/std-schemas';
+import { mockTransport } from '../../helpers/mock-mail';
 
 
 
@@ -44,7 +45,7 @@ const getForm = (data?: {[key: string]: any}) => {
 
 describe('POST /api/form/qna', async t => {
   const app = await build();
-  tdd.setDevTransport();
+  tdd.setDevTransport(mockTransport);
 
   const testTooShortName = await testForm({ name: 'a' });
   t({

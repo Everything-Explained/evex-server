@@ -10,7 +10,7 @@
     "build:ts": "tsc",
     "watch:ts": "tsc -w",
     "dev": "npm run build:ts && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"npm:watch:ts\" \"npm:dev:start\"",
-    "dev:start": "cross-env NODE_ENV=development fastify start --port 3001 --ignore-watch=.ts$ -w -l info -P dist/src/app.js"
+    "dev:start": "cross-env NODE_ENV=development fastify start --port 3001 --ignore-watch=.ts$ -w -l info -P dist/app.js"
   },
   "keywords": [],
   "author": "",
