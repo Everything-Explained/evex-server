@@ -3,13 +3,14 @@
 import { Type } from "@sinclair/typebox";
 import { FastifyInstance, FastifyReply, RouteShorthandOptions } from "fastify";
 import { paths } from "../../config";
+import { APIRequest } from "../../hooks/api-auth-hook";
 import { defaultResponseSchema } from "../../schemas/std-schemas";
 import { pathExtname, pathJoin } from "../../utils";
 
 
 
 
-interface DataRequest {
+type DataRequest = APIRequest & {
   Params: {
     dir: string;
     dir2: string;
@@ -33,6 +34,11 @@ const dataSchema: RouteShorthandOptions = {
 export function useDataRoutes(amount: number, f: FastifyInstance, rootURL: string) {
   for (let i = amount; i > 0; i--) {
     f.get<DataRequest>(`${rootURL}/data${createRouteParams(i)}`, dataSchema, async (req, res) => {
+      if (req.url.includes('/red33m')) {
+        if (!req.body.isRed33med) {
+          return res.forbidden('Suspicious Activity Detected');
+        }
+      }
       return await getPageData(req.params, res);
     });
   }

@@ -1,7 +1,7 @@
 
 
 import { describe } from 'riteway';
-import { build, constAuthedHeader } from '../../test.fastify';
+import { build, constAuthedHeader, r3dAuthHeader } from '../../test.fastify';
 import { BadRequestSchema } from '../../../src/schemas/std-schemas';
 import * as fs from 'fs-ext';
 import { openSync } from 'fs';
@@ -118,6 +118,26 @@ describe(`GET ${url}`, async t => {
     expected: 'EBUSY: resource busy or locked, read'
   });
 
+  t({
+    given: '/red33m & no red33m code',
+    should: 'send 403 status',
+    actual: (await testParams(`${url}/literature/red33m`, 'obj')).payload.statusCode,
+    expected: 403
+  });
+  t({
+    given: "/red33m & no red33m code",
+    should: 'send custom message',
+    actual: (await testParams(`${url}/literature/red33m`, 'obj')).payload.message,
+    expected: 'Suspicious Activity Detected'
+  });
+
+  t({
+    given: '/red33m & has red33m code',
+    should: 'send 200 status',
+    actual: (await testParams(`${url}/literature/red33m`, 'obj', r3dAuthHeader)).statusCode,
+    expected: 200
+  });
+
   // Cleanup everything here
   app.close();
 
@@ -125,8 +145,9 @@ describe(`GET ${url}`, async t => {
 
   async function testParams(url: string): Promise<StringPayload>
   async function testParams(url: string, payloadType: 'obj'): Promise<BadReqPayload>
-  async function testParams(url: string, payloadType?: 'obj') {
-    const { payload, statusCode } = await app.inject({ url, headers: constAuthedHeader });
+  async function testParams(url: string, payloadType: 'obj', headers: typeof constAuthedHeader): Promise<StringPayload>
+  async function testParams(url: string, payloadType?: 'obj', headers = constAuthedHeader) {
+    const { payload, statusCode } = await app.inject({ url, headers });
     return {
       statusCode,
       payload: payloadType == 'obj' && JSON.parse(payload) as BadRequestSchema || JSON.parse(payload) as { hello: string }
