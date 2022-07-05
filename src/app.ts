@@ -3,9 +3,10 @@ import AutoLoad, {AutoloadPluginOptions} from '@fastify/autoload';
 import { FastifyPluginAsync } from 'fastify';
 import api from './routes/api/api';
 import fastifyStatic from '@fastify/static';
-import { paths } from './config';
+import { inDev, paths } from './config';
 import { pathJoin } from './utils';
 import root from './routes/root';
+import cors from '@fastify/cors';
 
 export type AppOptions = {
   // Place your custom options for app below here.
@@ -47,6 +48,11 @@ const app: FastifyPluginAsync<AppOptions> = async (
     options: opts
   });
 
+  if (inDev) {
+    void fastify.register(cors, {
+      origin: 'http://127.0.0.1:3000',
+    });
+  }
   void fastify.register(api, opts);
   void fastify.register(root, opts);
 
