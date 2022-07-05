@@ -4,6 +4,7 @@ import { FastifyInstance, RouteShorthandOptions } from "fastify";
 import { paths } from "../../config";
 import { addUser } from "../../database/users";
 import { APIRequest } from "../../hooks/api-auth-hook";
+import { defaultResponseSchema } from "../../schemas/std-schemas";
 import { pathJoin } from "../../utils";
 
 
@@ -12,8 +13,7 @@ const dataPath = pathJoin(paths().web, '_data');
 const authSetupSchema: RouteShorthandOptions = {
   schema: {
     response: {
-      200: Type.String(),
-      201: Type.String(),
+      ...defaultResponseSchema,
     }
   }
 };

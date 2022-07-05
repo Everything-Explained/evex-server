@@ -6,7 +6,7 @@ import * as mailer from 'nodemailer';
 import Mail = require("nodemailer/lib/mailer");
 import { inDev, serverConfig } from "../../config";
 import { APIRequest } from "../../hooks/api-auth-hook";
-import { defaultResponsesSchema } from "../../schemas/std-schemas";
+import { defaultResponseSchema } from "../../schemas/std-schemas";
 import { tryCatchPromise } from "../../utils";
 
 
@@ -68,8 +68,7 @@ const formSchema: RouteShorthandOptions = {
   schema: {
     body: BodySchema,
     response: {
-      ...defaultResponsesSchema,
-      200: Type.String(),
+      ...defaultResponseSchema,
     }
   }
 };

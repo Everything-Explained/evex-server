@@ -1,7 +1,9 @@
 
 
-import { FastifyInstance, FastifyReply } from "fastify";
+import { Type } from "@sinclair/typebox";
+import { FastifyInstance, FastifyReply, RouteShorthandOptions } from "fastify";
 import { paths } from "../../config";
+import { defaultResponseSchema } from "../../schemas/std-schemas";
 import { pathExtname, pathJoin } from "../../utils";
 
 
@@ -18,12 +20,19 @@ interface DataRequest {
 
 
 const dataDir = pathJoin(paths().web, '_data');
+const dataSchema: RouteShorthandOptions = {
+  schema: {
+    response: {
+      ...defaultResponseSchema,
+    }
+  }
+};
 
 
 
 export function useDataRoutes(amount: number, f: FastifyInstance, rootURL: string) {
   for (let i = amount; i > 0; i--) {
-    f.get<DataRequest>(`${rootURL}/data${createRouteParams(i)}`, async (req, res) => {
+    f.get<DataRequest>(`${rootURL}/data${createRouteParams(i)}`, dataSchema, async (req, res) => {
       return await getPageData(req.params, res);
     });
   }
