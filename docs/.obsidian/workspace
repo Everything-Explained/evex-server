@@ -1,0 +1,91 @@
+{
+  "main": {
+    "id": "bc2ec03bba4bc9a9",
+    "type": "split",
+    "children": [
+      {
+        "id": "ce4aaaf864611cb9",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "routes.md",
+            "mode": "source",
+            "backlinks": false,
+            "source": false
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "11ed32943edbe71c",
+    "type": "split",
+    "children": [
+      {
+        "id": "c32807a1634e8aba",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "29d37fc6a63c28ae",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "d3b5aab1c795e43b",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "b36c1c68a6755d91",
+    "type": "split",
+    "children": [
+      {
+        "id": "29da965e8e01dd27",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6160b26e3f4f80fc",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "routes.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "ce4aaaf864611cb9",
+  "lastOpenFiles": [
+    "routes.md",
+    "commit_syntax.md",
+    "README.md",
+    "docs/commit_syntax.md"
+  ]
+}
