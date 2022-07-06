@@ -20,7 +20,7 @@ type DataRequest = APIRequest & {
 
 
 
-const dataDir = pathJoin(paths().web, '_data');
+const dataDir = pathJoin(paths().data, '_data');
 const dataSchema: RouteShorthandOptions = {
   schema: {
     response: {

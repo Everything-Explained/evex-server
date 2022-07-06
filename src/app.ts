@@ -24,12 +24,12 @@ const app: FastifyPluginAsync<AppOptions> = async (
   // /root/nextRoot/anotherRoot
 
   void fastify.register(fastifyStatic, {
-    root: paths().web,
+    root: paths().client,
     serve: false,
   });
 
   void fastify.register(fastifyStatic, {
-    root: pathJoin(paths().web, '_data'),
+    root: pathJoin(paths().data, '_data'),
     allowedPath: (pathName, root) => {
       return !!root?.includes('_data');
     },

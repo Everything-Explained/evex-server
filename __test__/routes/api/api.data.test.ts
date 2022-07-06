@@ -102,7 +102,7 @@ describe(`GET ${url}`, async t => {
     expected: 404
   });
 
-  const webPath = pathJoin(paths().web, mockURL, 'fileError.json');
+  const webPath = pathJoin(paths().data, mockURL, 'fileError.json');
   const fd = openSync(webPath, 'r');
   fs.flockSync(fd, 'ex');
   t({

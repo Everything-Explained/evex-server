@@ -8,7 +8,7 @@ import { pathExtname } from '../utils';
 
 
 
-const rootPath = paths().web;
+const rootPath = paths().client;
 
 const rootSchema: RouteShorthandOptions = {
   schema: {

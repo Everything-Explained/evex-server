@@ -20,9 +20,12 @@ export const serverConfig = (env: 'production'|'development' = process.env.NODE_
 };
 
 export const paths = (env: 'production'|'development' = process.env.NODE_ENV) => ({
-  web: env == 'development'
-        ? pathResolve('../web-client/release/web_client')
-        : pathResolve('../web_client')
+  client: env == 'development'
+        ? pathResolve('../web-client/dist')
+        : pathResolve('../web_client'),
+  data: env == 'development'
+    ? pathResolve('../web-client/release/web_client')
+    : pathResolve('../web_client')
 });
 
 

@@ -13,7 +13,7 @@ describe('config', async t => {
   t({
     given: 'node env production',
     should: 'set web path to ../web_client',
-    actual: paths('production').web,
+    actual: paths('production').client,
     expected: pathResolve('../web_client'),
   });
 
@@ -47,9 +47,9 @@ describe('config', async t => {
 
   t({
     given: 'node env development',
-    should: 'set web path to ../web-client/release/web_client',
-    actual: paths().web,
-    expected: pathResolve('../web-client/release/web_client'),
+    should: 'set web path to ../web-client/dist',
+    actual: paths().client,
+    expected: pathResolve('../web-client/dist'),
   });
 });
 

@@ -17,7 +17,7 @@ describe(`POST ${url}`, async t => {
 
   const badRequest = await app.inject({ url, headers: { 'authorization': '12345'} });
   const badPayload = JSON.parse(badRequest.payload) as BadRequestSchema;
-  const versionsFile = await readFile(`${paths().web}/_data/versions.json`, { encoding: 'utf-8'});
+  const versionsFile = await readFile(`${paths().data}/_data/versions.json`, { encoding: 'utf-8'});
   t({
     given: 'invalid auth header',
     should: 'send 400 status',
