@@ -39,6 +39,7 @@ export function useDataRoutes(amount: number, f: FastifyInstance, rootURL: strin
           return res.forbidden('Suspicious Activity Detected');
         }
       }
+      res.header('cache-control', 'public, max-age=31536000');
       return await getPageData(req.params, res);
     });
   }

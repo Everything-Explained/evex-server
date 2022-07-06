@@ -23,11 +23,12 @@ const rootSchema: RouteShorthandOptions = {
 
 const root: FastifyPluginAsync = async (fastify) => {
   fastify.get('/*', rootSchema, async function (req, res) {
-    const hasValidExt =
+    const isAsset =
          pathExtname(req.url) == '.js'
       || pathExtname(req.url) == '.css'
     ;
-    if (hasValidExt) {
+    if (isAsset) {
+      res.header('cache-control', 'public, max-age=31536000');
       return res.sendFile(req.url, rootPath);
     }
     // Always send index (SPA-compatibility)
