@@ -6,6 +6,8 @@ npm-debug.log*
 # Private files
 config.json
 scratch.ts
+private.key
+public.pem
 
 # Runtime data
 pids

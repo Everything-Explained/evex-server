@@ -7,6 +7,7 @@ import { inDev, paths } from './config';
 import { pathJoin } from './utils';
 import root from './routes/root';
 import cors from '@fastify/cors';
+import { httpsCredentials } from './ssl/ssl';
 
 export type AppOptions = {
   // Place your custom options for app below here.
@@ -59,4 +60,10 @@ const app: FastifyPluginAsync<AppOptions> = async (
 };
 
 export default app;
+export const options = {
+  http2: true,
+  https: {
+    ...httpsCredentials,
+  }
+};
 export { app };
