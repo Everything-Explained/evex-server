@@ -1,7 +1,6 @@
-import { Type } from '@sinclair/typebox';
 import { FastifyPluginAsync, RouteShorthandOptions } from 'fastify';
 import { paths } from '../config';
-import { defaultResponseSchema, stdErrorSchema } from '../schemas/std-schemas';
+import { defaultResponseSchema } from '../schemas/std-schemas';
 import { pathExtname } from '../utils';
 
 
@@ -13,8 +12,8 @@ const rootPath = paths().client;
 const rootSchema: RouteShorthandOptions = {
   schema: {
     response: {
-      ...defaultResponseSchema
-    }
+      ...defaultResponseSchema,
+    },
   }
 };
 
@@ -28,7 +27,7 @@ const root: FastifyPluginAsync = async (fastify) => {
       || pathExtname(req.url) == '.css'
     ;
     if (isAsset) {
-      res.header('cache-control', 'public, max-age=31536000');
+      res.header('cache-control', 'max-age=31536000');
       return res.sendFile(req.url, rootPath);
     }
     // Always send index (SPA-compatibility)

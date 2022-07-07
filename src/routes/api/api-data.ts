@@ -1,6 +1,5 @@
 
 
-import { Type } from "@sinclair/typebox";
 import { FastifyInstance, FastifyReply, RouteShorthandOptions } from "fastify";
 import { paths } from "../../config";
 import { APIRequest } from "../../hooks/api-auth-hook";
@@ -39,7 +38,7 @@ export function useDataRoutes(amount: number, f: FastifyInstance, rootURL: strin
           return res.forbidden('Suspicious Activity Detected');
         }
       }
-      res.header('cache-control', 'public, max-age=31536000');
+      res.header('cache-control', 'max-age=31536000');
       return await getPageData(req.params, res);
     });
   }
