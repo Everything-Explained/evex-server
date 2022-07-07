@@ -6,7 +6,8 @@
   "scripts": {
     "test": "cross-env NODE_ENV=development riteway -r ts-node/register/transpile-only __test__/**/*.test.ts | tap-nirvana",
     "cov": "cross-env NODE_ENV=development nyc --reporter=html --reporter=text-summary npm run test",
-    "stage": "cross-env NODE_ENV=development fastify start -a 0.0.0.0 --port=3003 --options -l info -P dist/app.js",
+    "stage:dev": "cross-env NODE_ENV=development fastify start --port=3003 -l info -P dist/app.js",
+    "stage:prod": "cross-env NODE_ENV=production fastify start -a 0.0.0.0 --port=3003 --options -l info -P dist/app.js",
     "build:ts": "tsc",
     "watch:ts": "tsc -w",
     "dev": "npm run build:ts && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"npm:watch:ts\" \"npm:dev:start\"",
