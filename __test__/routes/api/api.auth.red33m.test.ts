@@ -61,7 +61,7 @@ describe('PUT /api/auth/red33m', async t => {
   });
 
 
-  const testAlreadyLoggedIn = await testPasscode({ passcode: 'hello world'}, r3dAuthHeader);
+  const testAlreadyLoggedIn = await testPasscode({ passcode: 'AC3DAD'}, r3dAuthHeader);
   t({
     given: 'already existing credentials',
     should: 'send 409 status',
@@ -79,7 +79,7 @@ describe('PUT /api/auth/red33m', async t => {
   t({
     given: 'valid passcode',
     should: 'send 201 status',
-    actual: (await testPasscode({passcode: 'hello world'}, authorizedHeader)).statusCode,
+    actual: (await testPasscode({passcode: 'AC3DAD'}, authorizedHeader)).statusCode,
     expected: 201,
   });
 
