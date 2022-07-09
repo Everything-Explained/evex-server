@@ -1,36 +1,28 @@
 import fastifyStatic from "@fastify/static";
 import { FastifyInstance } from "fastify";
-import { paths } from "../config";
-import { pathResolve } from "../utils";
 
 
 type SubDomain = {
-  name  : string;
-  cache : boolean;
-  path  : string;
+  name      : string;
+  cache     : boolean;
+  /** Fully qualified path */
+  filesPath : string;
 }
 
-type SubDomainOptions = Omit<SubDomain, "path">[]
-
-const subDomainRoot = paths().subDomain;
 
 
-export const useSubDomainHook = (f: FastifyInstance, domainOpts: SubDomainOptions) => {
+export const useSubDomainHook = (f: FastifyInstance, subs: SubDomain[]) => {
 
-  const subDomains: SubDomain[] = domainOpts.map(d => (
-    {...d, path: pathResolve(`${subDomainRoot}/web-sub-${d.name}`)
-  }));
-
-  subDomains.forEach(d => {
+  subs.forEach(s => {
     void f.register(fastifyStatic, {
-      root: d.path,
+      root: s.filesPath,
       serve: false,
       decorateReply: false,
     });
   });
 
   f.addHook('onRequest', (req, res, done) => {
-    const domain = subDomains.find(d => req.hostname.indexOf(`${d.name}.`) == 0);
+    const domain = subs.find(d => req.hostname.indexOf(`${d.name}.`) == 0);
 
     if (!domain) {
       return done();
@@ -39,14 +31,14 @@ export const useSubDomainHook = (f: FastifyInstance, domainOpts: SubDomainOption
     // Allow web-frameworks to bust cache manually
     // therefore do not cache this route.
     if (req.url == '/') {
-      res.sendFile('/src/index.html', domain.path);
+      res.sendFile('/index.html', domain.filesPath);
       return;
     }
 
     if (domain.cache) {
       res.header('cache-control', 'max-age=31536000');
     }
-    res.sendFile(`/src/${req.url}`, domain.path);
+    res.sendFile(`/${req.url}`, domain.filesPath);
   });
 };
 
