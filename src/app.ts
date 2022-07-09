@@ -8,6 +8,7 @@ import { pathJoin } from './utils';
 import root from './routes/root';
 import cors from '@fastify/cors';
 import { httpsCredentials } from './ssl/ssl';
+import { useSubDomainHook } from './hooks/sub-domain-hook';
 
 export type AppOptions = {
   // Place your custom options for app below here.
@@ -39,8 +40,6 @@ const app: FastifyPluginAsync<AppOptions> = async (
     serve: false,
   });
 
-  // Do not touch the following lines
-
   // This loads all plugins defined in plugins
   // those should be support plugins that are reused
   // through your application
@@ -54,8 +53,11 @@ const app: FastifyPluginAsync<AppOptions> = async (
       origin: 'http://127.0.0.1:3000',
     });
   }
-  void fastify.register(api, opts);
-  void fastify.register(root, opts);
+  void useSubDomainHook(fastify, [
+    { name: 'meet', cache: false },
+  ]);
+  void fastify.register(api);
+  void fastify.register(root);
 
 };
 

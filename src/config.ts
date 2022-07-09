@@ -25,7 +25,8 @@ export const paths = (env: 'production'|'development' = process.env.NODE_ENV) =>
         : pathResolve('../web_client'),
   data: env == 'development'
     ? pathResolve('../web-client/release/web_client')
-    : pathResolve('../web_client')
+    : pathResolve('../web_client'),
+  subDomain: pathResolve('../'),
 });
 
 
