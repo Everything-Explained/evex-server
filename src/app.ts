@@ -32,9 +32,6 @@ const app: FastifyPluginAsync<AppOptions> = async (
 
   void fastify.register(fastifyStatic, {
     root: pathJoin(paths().data, '_data'),
-    allowedPath: (pathName, root) => {
-      return !!root?.includes('_data');
-    },
     decorateReply: false,
     index: false,
     serve: false,
