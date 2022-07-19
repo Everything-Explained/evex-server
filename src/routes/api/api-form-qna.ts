@@ -98,19 +98,23 @@ function isFormValid(body: QnAFormReqBody, res: FastifyReply) {
   const { name, email, type, isRed33med, questions } = body;
 
   if (!name.trim().match(/^([a-z.]|[^\S\r\n]){2,30}$/i)) {
-    return res.badRequest('Name is Invalid');
+    res.badRequest('Name is Invalid');
+    return false;
   }
 
   if (!email.trim().match(/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i)) {
-    return res.badRequest('Invalid E-mail');
+    res.badRequest('Invalid E-mail');
+    return false;
   }
 
   if (!FormType[type]) {
-    return res.badRequest('Invalid Form Type');
+    res.badRequest('Invalid Form Type');
+    return false;
   }
 
   if (type == FormType.Red33m && isRed33med) {
-    return res.conflict('Red33m access already Granted');
+    res.conflict('Red33m access already Granted');
+    return false;
   }
 
   const isValidQuestion =
@@ -122,7 +126,8 @@ function isFormValid(body: QnAFormReqBody, res: FastifyReply) {
   ;
 
   if (!isValidQuestion) {
-    return res.badRequest('Invalid Questions');
+    res.badRequest('Invalid Questions');
+    return false;
   }
 
   return true;
