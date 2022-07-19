@@ -38,141 +38,27 @@ const validForm = {
  */
 const getForm = (data?: {[key: string]: any}) => {
   const questions = validForm.questions.slice().map(v => ({ text: v.text, answer: v.answer}));
-  if (data) return { ...validForm, questions, ...data};
-  return { ...validForm, questions, };
+  if (data) return { ...validForm, questions, ...data} as QnAFormReqBody;
+  return { ...validForm, questions, } as QnAFormReqBody;
 };
 
 
-describe('POST /api/form/qna', async t => {
+describe.only('POST /api/form/qna', async t => {
   const app = await build();
   tdd.setDevTransport(mockTransport);
 
-  const testTooShortName = await testForm({ name: 'a' });
+  const testBadRequest = await testForm({ name: 'a' });
   t({
-    given: 'too short of a name',
+    given: 'a bad request',
     should: 'send 400 status',
-    actual: testTooShortName.payload.statusCode,
+    actual: testBadRequest.payload.statusCode,
     expected: 400
   });
   t({
-    given: 'too short of a name',
+    given: 'a bad request',
     should: 'send custom message',
-    actual: testTooShortName.payload.message,
+    actual: testBadRequest.payload.message,
     expected: 'Name is Invalid'
-  });
-
-
-  const testTooLongName = await testForm({ name: 'abcdefghijabcdefghijabcdefghijk' });
-  t({
-    given: 'too long of a name',
-    should: 'send 400 status',
-    actual: testTooLongName.payload.statusCode,
-    expected: 400
-  });
-  t({
-    given: 'too long of a name',
-    should: 'send custom message',
-    actual: testTooLongName.payload.message,
-    expected: 'Name is Invalid'
-  });
-
-
-  const testNewLineName = await testForm({ name: 'ab\ncd'});
-  t({
-    given: 'new line in name',
-    should: 'send 400 status',
-    actual: testNewLineName.payload.statusCode,
-    expected: 400
-  });
-  t({
-    given: 'new line in name',
-    should: 'send custom message',
-    actual: testNewLineName.payload.message,
-    expected: 'Name is Invalid'
-  });
-
-
-  const testSpecialCharacterName = await testForm({ name: 'f**k'});
-  t({
-    given: 'special characters in name',
-    should: 'send 400 status',
-    actual: testSpecialCharacterName.payload.statusCode,
-    expected: 400
-  });
-  t({
-    given: 'special characters in name',
-    should: 'send custom message',
-    actual: testSpecialCharacterName.payload.message,
-    expected: 'Name is Invalid'
-  });
-
-
-  t({
-    given: 'a valid name',
-    should: 'send 200 status',
-    actual: (await testForm({ name: 'Dr. Valid'}, 'string')).statusCode,
-    expected: 200
-  });
-
-
-  const testTooShortEmailExt = await testForm({ email: 'asdf@yas.c'});
-  t({
-    given: 'too short of an email extension',
-    should: 'send 400 status',
-    actual: testTooShortEmailExt.payload.statusCode,
-    expected: 400
-  });
-  t({
-    given: 'too short of an email extension',
-    should: 'send custom message',
-    actual: testTooShortEmailExt.payload.message,
-    expected: 'Invalid E-mail'
-  });
-
-
-  const testSpecialCharacterEmail = await testForm({ email: 'asdf*asdf@asdf.com'});
-  t({
-    given: 'special characters in email',
-    should: 'send 400 status',
-    actual: testSpecialCharacterEmail.payload.statusCode,
-    expected: 400
-  });
-  t({
-    given: 'special characters in email',
-    should: 'send custom message',
-    actual: testSpecialCharacterEmail.payload.message,
-    expected: 'Invalid E-mail'
-  });
-
-
-  t({
-    given: 'a valid email',
-    should: 'send 200 status',
-    actual: (await testForm({ email: 'aEa%324-.fas@test.com'}, 'string')).statusCode,
-    expected: 200
-  });
-
-
-  const testFormType = await testForm({ type: 7 });
-  t({
-    given: 'a non-existent form type',
-    should: 'send 400 status',
-    actual: testFormType.payload.statusCode,
-    expected: 400
-  });
-  t({
-    given: 'a non-existent form type',
-    should: 'send custom message',
-    actual: testFormType.payload.message,
-    expected: 'Invalid Form Type'
-  });
-
-
-  t({
-    given: 'a valid form type',
-    should: 'send 200 status',
-    actual: (await testForm({ type: 1}, 'string')).statusCode,
-    expected: 200
   });
 
 
@@ -191,134 +77,6 @@ describe('POST /api/form/qna', async t => {
   });
 
 
-  const testQuestionsLength = await testForm({ questions: []});
-  t({
-    given: 'no questions',
-    should: 'send 400 status',
-    actual: testQuestionsLength.payload.statusCode,
-    expected: 400
-  });
-  t({
-    given: 'no questions',
-    should: 'send custom message',
-    actual: testQuestionsLength.payload.message,
-    expected: 'Invalid Questions'
-  });
-
-
-  const testEmptyAnswer = await testForm({
-    questions: [
-      { text: validForm.questions[0].text, answer: '           '},
-      validForm.questions[1]
-    ]
-  });
-  t({
-    given: 'an empty answer',
-    should: 'send 400 status',
-    actual: testEmptyAnswer.payload.statusCode,
-    expected: 400
-  });
-  t({
-    given: 'an empty answer',
-    should: 'send custom message',
-    actual: testEmptyAnswer.payload.message,
-    expected: 'Invalid Questions'
-  });
-
-
-  const testEmptyQuestionText = await testForm({
-    questions: [
-      { text: '        ', answer: validForm.questions[0].answer},
-      validForm.questions[1]
-    ]
-  });
-  t({
-    given: 'empty question text',
-    should: 'send 400 status',
-    actual: testEmptyQuestionText.payload.statusCode,
-    expected: 400
-  });
-  t({
-    given: 'empty question text',
-    should: 'send custom message',
-    actual: testEmptyQuestionText.payload.message,
-    expected: 'Invalid Questions'
-  });
-
-
-  const testQuestionTextTooShort = await testForm({
-    questions: [
-      { text: 'hello world', answer: validForm.questions[0].answer},
-      validForm.questions[1]
-    ]
-  });
-  t({
-    given: 'question text that is too short',
-    should: 'send 400 status',
-    actual: testQuestionTextTooShort.payload.statusCode,
-    expected: 400
-  });
-  t({
-    given: 'question text that is too short',
-    should: 'send 400 status & message',
-    actual: testQuestionTextTooShort.payload.message,
-    expected: 'Invalid Questions'
-  });
-
-
-  const testAnswerTooShort = await testForm({
-    questions: [
-      { text: validForm.questions[0].text, answer: 'hello world'},
-      validForm.questions[1]
-    ]
-  });
-  t({
-    given: 'an answer that is too short',
-    should: 'send 400 status',
-    actual: testAnswerTooShort.payload.statusCode,
-    expected: 400
-  });
-  t({
-    given: 'an answer that is too short',
-    should: 'send custom message',
-    actual: testAnswerTooShort.payload.message,
-    expected: 'Invalid Questions'
-  });
-
-
-  const testTooShortRed33mAnswer = await testForm({
-    type: 0,
-    questions: [
-      {
-        text: validForm.questions[0].text,
-        answer: 'This answer is definitely too short for a red33m form because that is how its designed \
-                 to be'
-      },
-      validForm.questions[1]
-    ]
-  });
-  t({
-    given: 'an answer too short for red33m form type',
-    should: 'send 400 status',
-    actual: testTooShortRed33mAnswer.payload.statusCode,
-    expected: 400
-  });
-  t({
-    given: 'an answer too short for red33m form type',
-    should: 'send custom message',
-    actual: testTooShortRed33mAnswer.payload.message,
-    expected: 'Invalid Questions'
-  });
-
-
-  t({
-    given: 'valid questions',
-    should: 'send 200 status',
-    actual: (await testForm({}, 'string')).statusCode,
-    expected: 200
-  });
-
-
   const testFormError = await testForm({ name: 'throwError' });
   t({
     given: 'an error response from transport',
@@ -331,6 +89,14 @@ describe('POST /api/form/qna', async t => {
     should: 'send custom message',
     actual: testFormError.payload.message,
     expected: `I'm a bad boy!`
+  });
+
+
+  t({
+    given: 'a valid form',
+    should: 'send 200 status & OK',
+    actual: (await testForm({}, 'string')).payload,
+    expected: 'OK'
   });
 
 
@@ -357,6 +123,365 @@ describe('POST /api/form/qna', async t => {
     };
   }
 
+});
+
+
+describe('POST /api/form/qna -- validateForm()', async t => {
+  const testTooShortName = tdd.validateForm({ name: 'a' } as QnAFormReqBody);
+  t({
+    given: 'too short of a name',
+    should: 'return false',
+    actual: testTooShortName[0],
+    expected: false
+  });
+  t({
+    given: 'too short of a name',
+    should: 'return bad req type',
+    actual: testTooShortName[1],
+    expected: 'bad'
+  });
+  t({
+    given: 'too short of a name',
+    should: 'return error message',
+    actual: testTooShortName[2],
+    expected: 'Name is Invalid'
+  });
+
+
+  const testTooLongName = tdd.validateForm({ name: 'abcdefghijabcdefghijabcdefghijk' } as QnAFormReqBody);
+  t({
+    given: 'too long of a name',
+    should: 'return false',
+    actual: testTooLongName[0],
+    expected: false
+  });
+  t({
+    given: 'too long of a name',
+    should: 'return bad req type',
+    actual: testTooLongName[1],
+    expected: 'bad'
+  });
+  t({
+    given: 'too long of a name',
+    should: 'return error message',
+    actual: testTooLongName[2],
+    expected: 'Name is Invalid'
+  });
+
+
+  const testNewLineName = tdd.validateForm({ name: 'ab\ncd' } as QnAFormReqBody);
+  t({
+    given: 'new line in name',
+    should: 'return false',
+    actual: testNewLineName[0],
+    expected: false
+  });
+  t({
+    given: 'new line in name',
+    should: 'return bad req type',
+    actual: testNewLineName[1],
+    expected: 'bad'
+  });
+  t({
+    given: 'new line in name',
+    should: 'return error message',
+    actual: testNewLineName[2],
+    expected: 'Name is Invalid'
+  });
+
+
+  const testSpecialCharacterName = tdd.validateForm({ name: 'f**k' } as QnAFormReqBody);
+  t({
+    given: 'special characters in name',
+    should: 'return false',
+    actual: testSpecialCharacterName[0],
+    expected: false
+  });
+  t({
+    given: 'special characters in name',
+    should: 'return bad req type',
+    actual: testSpecialCharacterName[1],
+    expected: 'bad'
+  });
+  t({
+    given: 'special characters in name',
+    should: 'return error message',
+    actual: testSpecialCharacterName[2],
+    expected: 'Name is Invalid'
+  });
+
+
+  const validName = tdd.validateForm(getForm({ name: 'Dr. Valid' }));
+  t({
+    given: 'a valid name',
+    should: 'return true',
+    actual: validName[0],
+    expected: true
+  });
+
+
+  const testTooShortEmailExt = tdd.validateForm(getForm({ email: 'asdf@yas.c' }));
+  t({
+    given: 'too short of an email extension',
+    should: 'return false',
+    actual: testTooShortEmailExt[0],
+    expected: false
+  });
+  t({
+    given: 'too short of an email extension',
+    should: 'return bad req type',
+    actual: testTooShortEmailExt[1],
+    expected: 'bad'
+  });
+  t({
+    given: 'too short of an email extension',
+    should: 'return error message',
+    actual: testTooShortEmailExt[2],
+    expected: 'Invalid E-mail'
+  });
+
+
+  const testSpecialCharacterEmail = tdd.validateForm(getForm({ email: 'asdf*asdf@asdf.com' }));
+  t({
+    given: 'special characters in email',
+    should: 'return false',
+    actual: testSpecialCharacterEmail[0],
+    expected: false
+  });
+  t({
+    given: 'special characters in email',
+    should: 'return bad req type',
+    actual: testSpecialCharacterEmail[1],
+    expected: 'bad'
+  });
+  t({
+    given: 'special characters in email',
+    should: 'return error message',
+    actual: testSpecialCharacterEmail[2],
+    expected: 'Invalid E-mail'
+  });
+
+
+  t({
+    given: 'a valid email',
+    should: 'return true',
+    actual: tdd.validateForm(getForm({ email: 'aEa%324-.fas@test.com' }))[0],
+    expected: true
+  });
+
+
+  const badFormType = tdd.validateForm(getForm({ type: 7 }));
+  t({
+    given: 'a non-existent form type',
+    should: 'return false',
+    actual: badFormType[0],
+    expected: false
+  });
+  t({
+    given: 'a non-existent form type',
+    should: 'return bad req type',
+    actual: badFormType[1],
+    expected: 'bad'
+  });
+  t({
+    given: 'a non-existent form type',
+    should: 'return error message',
+    actual: badFormType[2],
+    expected: 'Invalid Form Type'
+  });
+
+
+  t({
+    given: 'a valid form type',
+    should: 'return true',
+    actual: tdd.validateForm(getForm({ type: 1 }))[0],
+    expected: true
+  });
+
+
+  const testExistingRed33mUser = tdd.validateForm(getForm( { type: 0, isRed33med: true }));
+  t({
+    given: 'a red33m form type when already authed',
+    should: 'return false',
+    actual: testExistingRed33mUser[0],
+    expected: false
+  });
+  t({
+    given: 'a red33m form type when already authed',
+    should: 'return "conflict" req type',
+    actual: testExistingRed33mUser[1],
+    expected: 'conflict'
+  });
+  t({
+    given: 'a red33m form type when already authed',
+    should: 'return error message',
+    actual: testExistingRed33mUser[2],
+    expected: 'Red33m access already Granted'
+  });
+
+
+  const testQuestionsLength = tdd.validateForm(getForm({ questions: [] }));
+  t({
+    given: 'no questions',
+    should: 'return false',
+    actual: testQuestionsLength[0],
+    expected: false
+  });
+  t({
+    given: 'no questions',
+    should: 'return bad req type',
+    actual: testQuestionsLength[1],
+    expected: 'bad'
+  });
+  t({
+    given: 'no questions',
+    should: 'return error message',
+    actual: testQuestionsLength[2],
+    expected: 'Invalid Questions'
+  });
+
+
+  const testEmptyAnswer = tdd.validateForm(getForm({
+    questions: [
+      { text: validForm.questions[0].text, answer: '           '},
+      validForm.questions[1]
+    ]
+  }));
+  t({
+    given: 'an empty answer',
+    should: 'return false',
+    actual: testEmptyAnswer[0],
+    expected: false
+  });
+  t({
+    given: 'an empty answer',
+    should: 'return bad req type',
+    actual: testEmptyAnswer[1],
+    expected: 'bad'
+  });
+  t({
+    given: 'an empty answer',
+    should: 'return false',
+    actual: testEmptyAnswer[2],
+    expected: 'Invalid Questions'
+  });
+
+
+  const testEmptyQuestionText = tdd.validateForm(getForm({
+    questions: [
+      { text: '        ', answer: validForm.questions[0].answer},
+      validForm.questions[1]
+    ]
+  }));
+  t({
+    given: 'empty question text',
+    should: 'return false',
+    actual: testEmptyQuestionText[0],
+    expected: false
+  });
+  t({
+    given: 'empty question text',
+    should: 'return bad req type',
+    actual: testEmptyQuestionText[1],
+    expected: 'bad'
+  });
+  t({
+    given: 'empty question text',
+    should: 'return error message',
+    actual: testEmptyQuestionText[2],
+    expected: 'Invalid Questions'
+  });
+
+
+  const testQuestionTextTooShort = tdd.validateForm(getForm({
+    questions: [
+      { text: 'hello world', answer: validForm.questions[0].answer},
+      validForm.questions[1]
+    ]
+  }));
+  t({
+    given: 'question text that is too short',
+    should: 'return false',
+    actual: testQuestionTextTooShort[0],
+    expected: false
+  });
+  t({
+    given: 'question text that is too short',
+    should: 'return bad req type',
+    actual: testQuestionTextTooShort[1],
+    expected: 'bad'
+  });
+  t({
+    given: 'question text that is too short',
+    should: 'return error message',
+    actual: testQuestionTextTooShort[2],
+    expected: 'Invalid Questions'
+  });
+
+
+  const testAnswerTooShort = tdd.validateForm(getForm({
+    questions: [
+      { text: validForm.questions[0].text, answer: 'hello world'},
+      validForm.questions[1]
+    ]
+  }));
+  t({
+    given: 'an answer too short for red33m form type',
+    should: 'return false',
+    actual: testAnswerTooShort[0],
+    expected: false
+  });
+  t({
+    given: 'an answer too short for red33m form type',
+    should: 'return bad req type',
+    actual: testAnswerTooShort[1],
+    expected: 'bad'
+  });
+  t({
+    given: 'an answer too short for red33m form type',
+    should: 'return error message',
+    actual: testAnswerTooShort[2],
+    expected: 'Invalid Questions'
+  });
+
+
+  const testTooShortRed33mAnswer = tdd.validateForm(getForm({
+    type: 0,
+    questions: [
+      {
+        text: validForm.questions[0].text,
+        answer: 'This answer is definitely too short for a red33m form because that is how its designed \
+                 to be'
+      },
+      validForm.questions[1]
+    ]
+  }));
+  t({
+    given: 'an answer that is too short',
+    should: 'return false',
+    actual: testTooShortRed33mAnswer[0],
+    expected: false
+  });
+  t({
+    given: 'an answer that is too short',
+    should: 'return bad req type',
+    actual: testTooShortRed33mAnswer[1],
+    expected: 'bad'
+  });
+  t({
+    given: 'an answer that is too short',
+    should: 'return error message',
+    actual: testTooShortRed33mAnswer[2],
+    expected: 'Invalid Questions'
+  });
+
+
+  t({
+    given: 'valid questions',
+    should: 'return true',
+    actual: tdd.validateForm(getForm({}))[0],
+    expected: true
+  });
 });
 
 

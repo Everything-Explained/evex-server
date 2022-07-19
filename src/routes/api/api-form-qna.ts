@@ -21,6 +21,8 @@ type FormRequest = APIRequest & {
 
 type FormQuestions = Static<typeof BodySchema>['questions'];
 
+type ValidationTuple = [isValid: boolean, reqType: 'bad'|'conflict'|null, errMsg: string];
+
 export type QnAFormReqBody = FormRequest['Body']
 
 
@@ -80,41 +82,42 @@ const formSchema: RouteShorthandOptions = {
 
 export function useFormQnA(f: FastifyInstance, rootURL: string) {
   f.post<FormRequest>(`${rootURL}/form/qna`, formSchema, async (req, res) => {
-    if (!isFormValid(req.body, res)) {
-      return;
+    const [isValid, reqType, errMsg] = validateForm(req.body);
+
+    if (isValid) {
+      const reply = await tryCatchPromise(state.transport.sendMail(createEmail(req.body)));
+      if (reply instanceof Error) {
+        return res.internalServerError(reply.message);
+      }
+      return 'OK';
     }
 
-    const reply = await tryCatchPromise(state.transport.sendMail(createEmail(req.body)));
-    if (reply instanceof Error) {
-      return res.internalServerError(reply.message);
+    if (reqType == 'conflict') {
+      return res.conflict(errMsg);
     }
 
-    return 'OK';
+    return res.badRequest(errMsg);
   });
 }
 
 
-function isFormValid(body: QnAFormReqBody, res: FastifyReply) {
+function validateForm(body: QnAFormReqBody): ValidationTuple {
   const { name, email, type, isRed33med, questions } = body;
 
   if (!name.trim().match(/^([a-z.]|[^\S\r\n]){2,30}$/i)) {
-    res.badRequest('Name is Invalid');
-    return false;
+    return [false, 'bad', 'Name is Invalid'];
   }
 
   if (!email.trim().match(/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i)) {
-    res.badRequest('Invalid E-mail');
-    return false;
+    return [false, 'bad', 'Invalid E-mail'];
   }
 
   if (!FormType[type]) {
-    res.badRequest('Invalid Form Type');
-    return false;
+    return [false, 'bad', 'Invalid Form Type'];
   }
 
   if (type == FormType.Red33m && isRed33med) {
-    res.conflict('Red33m access already Granted');
-    return false;
+    return [false, 'conflict', 'Red33m access already Granted'];
   }
 
   const isValidQuestion =
@@ -126,11 +129,10 @@ function isFormValid(body: QnAFormReqBody, res: FastifyReply) {
   ;
 
   if (!isValidQuestion) {
-    res.badRequest('Invalid Questions');
-    return false;
+    return [false, 'bad', 'Invalid Questions'];
   }
 
-  return true;
+  return [true, null, ''];
 }
 
 
@@ -175,6 +177,7 @@ export const _tdd_testAPIFormQna = {
   htmlSpan,
   htmlCloseSpan,
   formSubjects,
+  validateForm,
   createEmail,
   buildHTMLMsg,
   buildTextMsg,
