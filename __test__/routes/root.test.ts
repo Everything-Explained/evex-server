@@ -25,18 +25,20 @@ describe('GET /', async t => {
     expected: 'public, max-age=0',
   });
 
+
   t({
-    given: `/robots.txt request`,
+    given: `a file request`,
     should: 'send file',
     actual: (await testRoot('/robots.txt')).payload,
     expected: 'User-agent: *\r\nAllow: /',
   });
   t({
-    given: `/robots.txt request`,
+    given: `a file request`,
     should: 'cache file',
     actual: (await testRoot('/robots.txt')).headers['cache-control'],
     expected: 'max-age=31536000',
   });
+
 
   // Cleanup everything here
   app.close();
