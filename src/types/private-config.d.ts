@@ -4,6 +4,7 @@
 export interface ServerConfig {
   auth: ConfigAuth;
   mail: Mail;
+  allowedDevOrigins: string[];
 }
 
 interface ConfigAuth {

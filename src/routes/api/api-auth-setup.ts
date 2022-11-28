@@ -9,7 +9,7 @@ import { pathJoin } from "../../utils";
 
 
 
-const dataPath = pathJoin(paths().data, '_data');
+const dataPath = pathJoin(paths.data, '_data');
 const authSetupSchema: RouteShorthandOptions = {
   schema: {
     response: {

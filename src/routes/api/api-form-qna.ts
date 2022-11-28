@@ -1,13 +1,13 @@
 
 
 import { Static, Type } from "@sinclair/typebox";
-import { FastifyInstance, FastifyReply, RouteShorthandOptions } from "fastify";
+import { FastifyInstance, RouteShorthandOptions } from "fastify";
 import * as mailer from 'nodemailer';
 import Mail = require("nodemailer/lib/mailer");
-import { inDev, serverConfig } from "../../config";
+import { serverConfig } from "../../config";
 import { APIRequest } from "../../hooks/api-auth-hook";
 import { defaultResponseSchema } from "../../schemas/std-schemas";
-import { tryCatchPromise } from "../../utils";
+import { isDev, isStaging, tryCatchPromise } from "../../utils";
 
 
 
@@ -44,11 +44,10 @@ const formSubjects: Array<FormSubject> = [
   `EvEx Form - I want to correct you`,
 ];
 
-const config = serverConfig();
 
 const state = {
   transport: mailer.createTransport(
-    inDev && config.mail.mailtrap || config.mail.sendinblue
+    (isDev() || isStaging()) && serverConfig.mail.mailtrap || serverConfig.mail.sendinblue
   )
 };
 
@@ -141,7 +140,7 @@ function createEmail(body: QnAFormReqBody) {
 
   const mail: Mail.Options = {
     from    : `"${name}" <${email}>`,
-    to      : config.mail.toEthan,
+    to      : serverConfig.mail.toEthan,
     subject : formSubjects[type],
     text    : buildTextMsg(questions),
     html    : buildHTMLMsg(questions),

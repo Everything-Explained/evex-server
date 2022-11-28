@@ -16,7 +16,7 @@ type AuthRed33mRequest = APIRequest & {
   Body: { passcode: string };
 }
 
-const red33mHash = serverConfig().auth.red33m;
+const red33mHash = serverConfig.auth.red33m;
 const apiOptions: RouteShorthandOptions = {
   schema: {
     body: Type.Strict(Type.Required(Type.Object({
