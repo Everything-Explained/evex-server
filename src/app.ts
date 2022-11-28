@@ -50,13 +50,13 @@ const app: FastifyPluginAsync<AppOptions> = async (
       origin: 'http://127.0.0.1:3000',
     });
   }
-  void useSubDomainHook(fastify, [
-    {
-      name: 'meet',
-      cache: false,
-      filesPath: pathJoin(paths().subDomain, 'web-sub-meet', 'src')
-    },
-  ]);
+  // void useSubDomainHook(fastify, [
+  //   {
+  //     name: 'meet',
+  //     cache: false,
+  //     filesPath: pathJoin(paths().subDomain, 'web-sub-meet', 'src')
+  //   },
+  // ]);
   void fastify.register(api);
   void fastify.register(root);
 
