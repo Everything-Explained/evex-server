@@ -69,6 +69,11 @@ async function getPageData(params: object, res: FastifyReply) {
 }
 
 
+/**
+ * Converts paths like /url/to/data => /url/to/data/data.json
+ * @param params URL Params
+ * @returns modified URL
+ */
 function getFilePathFromParams(params: object) {
   const segments  = Object.values(params);
   const lastSeg   = segments.pop();
