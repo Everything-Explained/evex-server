@@ -3,12 +3,11 @@ import AutoLoad, {AutoloadPluginOptions} from '@fastify/autoload';
 import { FastifyPluginAsync } from 'fastify';
 import api from './routes/api/api';
 import fastifyStatic from '@fastify/static';
-import { inDev, paths } from './config';
-import { pathJoin } from './utils';
+import { paths, serverConfig } from './config';
+import { isDev, isStaging, pathJoin } from './utils';
 import root from './routes/root';
 import cors from '@fastify/cors';
 import { httpsCredentials } from './ssl/ssl';
-import { useSubDomainHook } from './hooks/sub-domain-hook';
 
 export type AppOptions = {
   // Place your custom options for app below here.
@@ -45,9 +44,9 @@ const app: FastifyPluginAsync<AppOptions> = async (
     options: opts
   });
 
-  if (inDev) {
+  if (isDev() || isStaging()) {
     void fastify.register(cors, {
-      origin: 'http://127.0.0.1:3000',
+      origin: serverConfig.allowedDevOrigins,
     });
   }
   // void useSubDomainHook(fastify, [
