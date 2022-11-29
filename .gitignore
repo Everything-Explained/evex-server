@@ -8,6 +8,7 @@ config.json
 scratch.ts
 private.key
 public.pem
+users.json
 
 # Runtime data
 pids
