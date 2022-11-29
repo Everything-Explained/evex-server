@@ -8,6 +8,7 @@
     "cov": "cross-env NODE_ENV=development nyc --reporter=html --reporter=text-summary npm run test",
     "stage:dev": "cross-env NODE_ENV=development fastify start -a 0.0.0.0 --port=3001 -l info -P dist/app.js",
     "stage:prod": "cross-env NODE_ENV=staging fastify start -a 0.0.0.0 --port=3001 --options -l info -P app.js",
+    "start": "cross-env NODE_ENV=production fastify start -a 0.0.0.0 --port 443 --options -l info -P app.js",
     "build:ts": "tsc",
     "watch:ts": "tsc -w",
     "dev": "npm run build:ts && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"npm:watch:ts\" \"npm:dev:start\"",
