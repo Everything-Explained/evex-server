@@ -2,9 +2,8 @@
 import Fastify from 'fastify';
 import fp from 'fastify-plugin';
 import App from '../src/app';
-import { paths } from '../src/config';
 import { useSubDomainHook } from '../src/hooks/sub-domain-hook';
-import { pathJoin, pathResolve } from '../src/utils';
+import { pathJoin } from '../src/utils';
 
 export const userID = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz';
 export const r3dUserID = 'zyxwvutsrqponmlkjihgfedcbazyxwvutsrqponmlkjihgfedcba';

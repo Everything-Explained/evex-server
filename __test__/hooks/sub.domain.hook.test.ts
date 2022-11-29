@@ -9,7 +9,7 @@ import { build, constAuthedHeader } from '../test.fastify';
 
 
 
-const subDomainPath = pathResolve(paths().subDomain, 'web-sub-meet', 'src');
+const subDomainPath = pathResolve(paths.subDomain, 'web-sub-meet', 'src');
 
 
 describe('Sub Domain -- onRequest() hook', async t => {
@@ -32,7 +32,7 @@ describe('Sub Domain -- onRequest() hook', async t => {
     expected: subDomainIndex
   });
 
-  const clientIndex = await readFile(`${paths().client}/index.html`, { encoding: 'utf-8'});
+  const clientIndex = await readFile(`${paths.client}/index.html`, { encoding: 'utf-8'});
   t({
     given: 'no subdomain',
     should: 'pass to next route handler',

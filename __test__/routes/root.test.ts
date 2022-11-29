@@ -11,7 +11,7 @@ import { build, constAuthedHeader } from '../test.fastify';
 describe('GET /', async t => {
   const app = await build();
 
-  const indexPage = await readFile(`${paths().client}/index.html`, { encoding: 'utf-8'});
+  const indexPage = await readFile(`${paths.client}/index.html`, { encoding: 'utf-8'});
   t({
     given: '/ request',
     should: 'send index',
