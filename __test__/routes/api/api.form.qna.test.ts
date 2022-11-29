@@ -43,7 +43,7 @@ const getForm = (data?: {[key: string]: any}) => {
 };
 
 
-describe.only('POST /api/form/qna', async t => {
+describe('POST /api/form/qna', async t => {
   const app = await build();
   tdd.setDevTransport(mockTransport);
 
