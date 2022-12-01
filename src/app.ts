@@ -17,7 +17,6 @@ const app: FastifyPluginAsync<AppOptions> = async (
     fastify,
     opts
 ): Promise<void> => {
-
   // All registered static URLs must follow
   // a specific registration path
   // /root
@@ -66,6 +65,10 @@ export const options = {
   http2: true,
   https: {
     ...httpsCredentials,
+  },
+  logger: {
+    level: 'info',
+    file: `${pathJoin(process.cwd())}/logs/${(new Date()).toISOString().split('.')[0].replaceAll(':', '-')}.txt`
   }
 };
 export { app };
