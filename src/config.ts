@@ -26,11 +26,11 @@ export const serverConfig = (() => {
 
 export const paths = (() => {
   const client = inDev
-    ? pathResolve('../web-client/dist')
+    ? pathResolve('../client/dist')
     : pathResolve('../client');
 
   const data = inDev
-    ? pathResolve('../evex-staging/client')
+    ? pathResolve('../staging/client')
     : pathResolve('../client');
 
   return { client, data, subDomain: pathResolve('../') };
