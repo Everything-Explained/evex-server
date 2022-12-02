@@ -1,5 +1,4 @@
 
-import { Type } from "@sinclair/typebox";
 import { FastifyInstance, RouteShorthandOptions } from "fastify";
 import { paths } from "../../config";
 import { addUser } from "../../database/users";
