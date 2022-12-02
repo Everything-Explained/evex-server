@@ -13,7 +13,12 @@ const config: ServerConfig = JSON.parse(
 const inDev = isDev();
 
 export const serverConfig = (() => {
-  const clonedConfig = { mail: { ...config.mail }, auth: { ...config.auth }, allowedDevOrigins: config.allowedDevOrigins  };
+  const clonedConfig = {
+    mail: { ...config.mail },
+    auth: { ...config.auth },
+    allowedDevOrigins: config.allowedDevOrigins,
+    securityHeader: config.securityHeader,
+  };
   clonedConfig.mail.toEthan = inDev && 'fake@test.yee' || config.mail.toEthan;
   clonedConfig.auth.red33m  = inDev && config.auth.testCode || config.auth.red33m;
   return clonedConfig;

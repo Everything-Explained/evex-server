@@ -4,7 +4,7 @@ import { FastifyPluginAsync } from 'fastify';
 import api from './routes/api/api';
 import fastifyStatic from '@fastify/static';
 import { paths, serverConfig } from './config';
-import { isDev, isStaging, pathJoin } from './utils';
+import { isDev, isProduction, isStaging, pathJoin } from './utils';
 import root from './routes/root';
 import cors from '@fastify/cors';
 import { httpsCredentials } from './ssl/ssl';
@@ -46,6 +46,12 @@ const app: FastifyPluginAsync<AppOptions> = async (
   if (isDev() || isStaging()) {
     void fastify.register(cors, {
       origin: serverConfig.allowedDevOrigins,
+    });
+  }
+  if (isProduction()) {
+    fastify.addHook('onRequest', (req, rep, done) => {
+      if (req.headers[serverConfig.securityHeader] == 'cloudflare') done();
+      else rep.status(403).send();
     });
   }
   // void useSubDomainHook(fastify, [
