@@ -51,8 +51,7 @@ export const useAPIAuthHook = (fastify: FastifyInstance) => {
       done();
     }
     else {
-      res.code(401);
-      done(Error('Not Authorized'));
+      res.status(401).send('Not Authorized');
     }
 
   });

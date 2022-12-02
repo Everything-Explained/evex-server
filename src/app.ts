@@ -72,6 +72,8 @@ export const options = {
   https: {
     ...httpsCredentials,
   },
+  requestTimeout: 120000,
+  connectionTimeout: 5000,
   logger: {
     level: 'info',
     file: `${pathJoin(process.cwd())}/logs/${(new Date()).toISOString().split('.')[0].replaceAll(':', '-')}.txt`
