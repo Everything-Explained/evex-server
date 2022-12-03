@@ -12,7 +12,7 @@ import { build, constAuthedHeader } from '../test.fastify';
 const subDomainPath = pathResolve(paths.subDomain, 'web-sub-meet', 'src');
 
 
-describe('Sub Domain -- onRequest() hook', async t => {
+describe.skip('Sub Domain -- onRequest() hook', async t => {
   const app = await build();
 
   t({
