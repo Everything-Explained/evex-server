@@ -32,14 +32,14 @@ const dataSchema: RouteShorthandOptions = {
 
 export function useDataRoutes(amount: number, f: FastifyInstance, rootURL: string) {
   for (let i = amount; i > 0; i--) {
-    f.get<DataRequest>(`${rootURL}/data${createRouteParams(i)}`, dataSchema, async (req, res) => {
+    f.get<DataRequest>(`${rootURL}/data${createRouteParams(i)}`, dataSchema, (req, res) => {
       if (req.url.includes('/red33m')) {
         if (!req.body.isRed33med) {
           return res.forbidden('Suspicious Activity Detected');
         }
       }
       res.header('cache-control', 'max-age=31536000');
-      return await getPageData(req.params, res);
+      return getPageData(req.params, res);
     });
   }
 }
@@ -53,16 +53,16 @@ function createRouteParams(amount: number) {
 }
 
 
-async function getPageData(params: object, res: FastifyReply) {
+function getPageData(params: object, res: FastifyReply) {
   const path = getFilePathFromParams(params);
 
   if (pathExtname(path) == '.json') {
-    return res.sendFile(path, dataDir);
+    return void res.sendFile(path, dataDir);
   }
 
   if (pathExtname(path) == '.mdhtml') {
     res.header('Content-Type', 'text/html; charset=utf-8');
-    return res.sendFile(path, dataDir);
+    return void res.sendFile(path, dataDir);
   }
 
   return res.unsupportedMediaType('Unsupported Request');

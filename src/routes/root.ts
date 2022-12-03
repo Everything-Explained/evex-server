@@ -21,15 +21,15 @@ const rootSchema: RouteShorthandOptions = {
 
 
 const root: FastifyPluginAsync = async (fastify) => {
-  fastify.get('/*', rootSchema, async function (req, res) {
+  fastify.get('/*', rootSchema, function (req, res) {
 
     if (pathExtname(req.url)) {
       res.header('cache-control', 'max-age=31536000');
-      return res.sendFile(req.url, rootPath);
+      return void res.sendFile(req.url, rootPath);
     }
 
     // Always send index (SPA-compatibility)
-    return res.sendFile('/index.html', rootPath);
+    return void res.sendFile('/index.html', rootPath);
   });
 };
 

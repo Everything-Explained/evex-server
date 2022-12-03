@@ -88,7 +88,7 @@ export function useFormQnA(f: FastifyInstance, rootURL: string) {
       if (reply instanceof Error) {
         return res.internalServerError(reply.message);
       }
-      return 'OK';
+      return res.status(200).send('OK');
     }
 
     if (reqType == 'conflict') {

@@ -46,8 +46,7 @@ const useAuthRed33mRoute = (fastify: FastifyInstance, rootURL: string) => {
     }
 
     await updateUser(userID, 'code');
-    res.code(201);
-    return 'OK';
+    res.code(201).send('OK');
   });
 };
 
