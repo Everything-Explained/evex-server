@@ -47,9 +47,9 @@ describe('config', async t => {
 
   t({
     given: 'node env development',
-    should: 'set web path to ../web-client/dist',
+    should: 'set web path to ../client/dist',
     actual: paths.client,
-    expected: pathResolve('../web-client/dist'),
+    expected: pathResolve('../client/dist'),
   });
 });
 
