@@ -48,7 +48,7 @@ const app: FastifyPluginAsync<AppOptions> = async (
       origin: serverConfig.allowedDevOrigins,
     });
   }
-  if (isProduction()) {
+  if (isProduction() && !isStaging()) {
     fastify.addHook('onRequest', (req, rep, done) => {
       if (req.headers[serverConfig.securityHeader] == 'cloudflare') done();
       else rep.status(403).send();
