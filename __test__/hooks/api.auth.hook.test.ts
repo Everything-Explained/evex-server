@@ -1,6 +1,7 @@
 import { IncomingHttpHeaders } from "http";
 import { describe } from "riteway";
-import { build, userID } from "../test.fastify";
+import build from "../../src/app2";
+import { userID } from "../test.fastify";
 
 
 

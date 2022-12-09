@@ -1,10 +1,11 @@
 
 
 import { describe } from 'riteway';
-import { build, constAuthedHeader } from '../../test.fastify';
+import { constAuthedHeader } from '../../test.fastify';
 import { BadRequestSchema } from '../../../src/schemas/std-schemas';
 import { paths } from '../../../src/config';
 import { readFile, writeFile } from 'fs/promises';
+import build from '../../../src/app2';
 
 
 

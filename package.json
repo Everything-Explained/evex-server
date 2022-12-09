@@ -6,7 +6,7 @@
   "scripts": {
     "test": "cross-env NODE_ENV=development riteway -r ts-node/register/transpile-only __test__/**/*.test.ts | tap-nirvana",
     "cov": "cross-env NODE_ENV=development nyc --reporter=html --reporter=text-summary npm run test",
-    "stage:dev": "cross-env NODE_ENV=development fastify start -a 0.0.0.0 --port=3001 -l info -P dist/app.js",
+    "stage:dev": "cross-env NODE_ENV=development node ./dist/server.js",
     "stage:prod": "cross-env NODE_ENV=staging fastify start -a 0.0.0.0 --port=3001 --options -l info -P app.js",
     "start": "cross-env NODE_ENV=production fastify start -a 0.0.0.0 --port 443 --options -l info app.js",
     "build:ts": "tsc",
@@ -43,6 +43,7 @@
     "fastify-tsconfig": "^1.0.1",
     "fs-ext": "^2.0.0",
     "nyc": "^15.1.0",
+    "pino-pretty": "^9.1.1",
     "riteway": "^6.3.1",
     "tap-nirvana": "^1.1.0",
     "ts-node": "^10.8.0",

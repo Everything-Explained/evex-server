@@ -1,10 +1,11 @@
 
 
 import { readFile, writeFile } from 'fs/promises';
-import { authorizedHeader, build, constAuthedHeader, r3dAuthHeader, userID } from '../../test.fastify';
+import { authorizedHeader, constAuthedHeader, r3dAuthHeader, userID } from '../../test.fastify';
 import { describe } from 'riteway';
 import { BadRequestSchema } from '../../../src/schemas/std-schemas';
 import { getUserState } from '../../../src/database/users';
+import build from '../../../src/app2';
 
 
 

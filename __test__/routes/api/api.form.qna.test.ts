@@ -1,11 +1,12 @@
 
 
 import { describe } from 'riteway';
-import { build, constAuthedHeader, r3dAuthHeader } from '../../test.fastify';
+import { constAuthedHeader, r3dAuthHeader } from '../../test.fastify';
 import { QnAFormReqBody, _tdd_testAPIFormQna } from '../../../src/routes/api/api-form-qna';
 import { serverConfig } from '../../../src/config';
 import { BadRequestSchema } from '../../../src/schemas/std-schemas';
 import { mockTransport } from '../../helpers/mock-mail';
+import build from '../../../src/app2';
 
 
 

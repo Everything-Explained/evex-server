@@ -2,8 +2,9 @@
 
 import { readFile } from 'fs/promises';
 import { describe } from 'riteway';
+import build from '../../src/app2';
 import { paths } from '../../src/config';
-import { build, constAuthedHeader } from '../test.fastify';
+import { constAuthedHeader } from '../test.fastify';
 
 
 

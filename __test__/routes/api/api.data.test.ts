@@ -1,12 +1,13 @@
 
 
 import { describe } from 'riteway';
-import { build, constAuthedHeader, r3dAuthHeader } from '../../test.fastify';
+import { constAuthedHeader, r3dAuthHeader } from '../../test.fastify';
 import { BadRequestSchema } from '../../../src/schemas/std-schemas';
 import * as fs from 'fs-ext';
 import { openSync } from 'fs';
 import { paths } from '../../../src/config';
 import { pathJoin } from '../../../src/utils';
+import build from '../../../src/app2';
 
 
 
